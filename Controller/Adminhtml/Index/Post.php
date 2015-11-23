@@ -85,7 +85,7 @@ class Post extends \Magento\Backend\App\Action
                     $this->messageManager->addError($e->getMessage());
                 }
 
-                $this->download('InstallSchemaTESTING.php', $result);
+                $this->download('InstallSchema.php', $result);
                 $this->messageManager->addSuccess(__('Your InstallSchema.php is downloading !'));   
             }
         }
