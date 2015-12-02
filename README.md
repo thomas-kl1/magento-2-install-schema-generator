@@ -22,7 +22,7 @@ In order to be able to install it, you'll need to be sure that your root compose
 
 The above can also be added via the composer cli with the command: 
 
-    composer config repositories.magento vcs https://bitbucket.org/blackbirdagency/magento2-extensions-isgenerator/
+    composer config repositories.blackbird_isg vcs https://bitbucket.org/blackbirdagency/magento2-extensions-isgenerator/
 
 ## Contributors
 
