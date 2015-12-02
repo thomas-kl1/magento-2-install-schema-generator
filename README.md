@@ -28,7 +28,7 @@ The above can also be added via the composer cli with the command:
 
 Once the repository added, run the two following commands:
 
-    composer require blackbird/blackbird/installschemagenerator
+    composer require blackbird/installschemagenerator
     php bin/magento setup:upgrade
 
 ## Contributors
