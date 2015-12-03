@@ -36,9 +36,12 @@ class SchemaSetupBuilder
      * @param array $schema
      * @return string
      */
-    public function getSetupBySchema($schema)
+    public function getSetupBySchema(array $schema, $namespace = '')
     {
-        $installSchema = $this->getHeader();
+        if (!$this->isNamespace($namespace)) {
+            $namespace = "Vendor\Area";
+        }
+        $installSchema = $this->getHeader($namespace);
         
         foreach ($schema as $name=>$table) {
             $installSchema .= $this->getNewTable($name, $table);
@@ -47,6 +50,17 @@ class SchemaSetupBuilder
         $installSchema .= $this->getFooter();
         
         return $installSchema;
+    }
+    
+    private function isNamespace($namespace)
+    {
+        $return = (!empty($namespace));
+        
+        if ($return) {
+            $return = (count(explode("\\", $namespace)) === 2);
+        }
+        
+        return $return;
     }
     
     /**
@@ -422,10 +436,10 @@ class SchemaSetupBuilder
      *
      * @return string
      */
-    private function getHeader()
+    private function getHeader($namespace)
     {
         $return = "<?php" . PHP_EOL;
-        $return .= "namespace Vendor\Area\Setup;" . PHP_EOL;
+        $return .= "namespace " . $namespace . "\Setup;" . PHP_EOL;
         $return .= PHP_EOL;
         $return .= "use Magento\Framework\Setup\InstallSchemaInterface;" . PHP_EOL;
         $return .= "use Magento\Framework\Setup\ModuleContextInterface;" . PHP_EOL;

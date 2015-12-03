@@ -20,9 +20,7 @@
  */
 namespace Blackbird\InstallSchemaGenerator\Model\Resource;
 
-use Magento\Framework\Model\Resource\Db\AbstractDb;
-use Magento\Framework\Config\Data\ConfigData;
-use Magento\Framework\Config\File\ConfigFilePool;
+use Magento\Framework\Model\ResourceModel\Db\AbstractDb;
 
 class SchemaRetriever extends AbstractDb
 {       
@@ -31,8 +29,9 @@ class SchemaRetriever extends AbstractDb
     public function _construct()
     {
         // Load default configuration        
-        $config = $this->_getReadAdapter()->getConfig();
-        $this->dbname = $config['dbname'];
+        //$config = $this->_getReadAdapter()->getConfig();
+        //$this->dbname = $config['dbname'];
+        $this->dbname = 'magento2-acm';
     }
     
     /**
@@ -47,6 +46,20 @@ class SchemaRetriever extends AbstractDb
         // Prepare query
         $fetch = $this->getReadConnection()->fetchAll($sql);
         return $fetch;
+    }
+    
+    public function getTablesOptions() {
+        $tables = $this->getTables();
+        $options = array();
+        
+        foreach ($tables as $table) {
+            $options[] = [
+                'value' => $table,
+                'label' => __($table)
+            ];
+        }
+        
+        return $options;
     }
     
     /**

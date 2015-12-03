@@ -21,8 +21,9 @@
 namespace Blackbird\InstallSchemaGenerator\Controller\Adminhtml\Index;
 
 use Magento\Framework\App\Filesystem\DirectoryList;
+use Magento\Backend\App\Action;
 
-class Post extends \Magento\Backend\App\Action
+class Retriever extends Action
 {
     /**
      * @var \Magento\Framework\App\Response\Http\FileFactory
@@ -67,9 +68,11 @@ class Post extends \Magento\Backend\App\Action
      */
     public function execute()
     {
+        $resultRedirect = $this->resultRedirectFactory->create();
         $isPost = $this->getRequest()->getPost();
         
         if($isPost) {
+            $namespace = $this->getRequest()->getParam('namespace');
             $tables = $this->getRequest()->getParam('tables');
         
             if (!is_array($tables)) {
@@ -80,7 +83,7 @@ class Post extends \Magento\Backend\App\Action
 
                 try {
                     $schema = $retriever->getSchema($tables);
-                    $result = $builder->getSetupBySchema($schema);
+                    $result = $builder->getSetupBySchema($schema, $namespace);
                 } catch (\Exception $e) {
                     $this->messageManager->addError($e->getMessage());
                 }
@@ -90,7 +93,6 @@ class Post extends \Magento\Backend\App\Action
             }
         }
         
-        $this->_redirect('*/*/index');
-        return;
+        return $resultRedirect->setPath('*/*/');
     }
 }

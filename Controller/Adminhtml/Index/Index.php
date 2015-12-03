@@ -25,34 +25,20 @@ use Magento\Framework\View\Result\PageFactory;
 use Magento\Backend\App\Action\Context;
 
 class Index extends Action
-{
-    /**
-     * @var PageFactory
-     */
-    protected $_resultPageFactory;
-    
-    /**
-     * @param \Magento\Backend\App\Action\Context $context
-     * @param PageFactory $resultPageFactory
-     */
-    public function __construct(Context $context, PageFactory $resultPageFactory)
-    {
-        parent::__construct($context);
-        $this->_resultPageFactory = $resultPageFactory;
-    }
-    
+{    
     /**
      * @return void
      */
     public function execute()
     {
-        /** @var \Magento\Backend\Model\View\Result\Page $resultPage */
-        $resultPage = $this->_resultPageFactory->create();
-        $resultPage->setActiveMenu('Blackbird_InstallSchemaGenerator::main_menu');
-        $resultPage->getConfig()->getTitle()->prepend(__('Install Schema Generator'));
-        $resultPage->getLayout()->getBlock('retriever')
-            ->setFormAction($this->_url->getUrl('*/*/post'), ['_current' => true]);
+        $resultRedirect = $this->resultRedirectFactory->create();
         
-        return $resultPage;
+        $this->_view->loadLayout();
+        
+        $this->_setActiveMenu('Blackbird_InstallSchemaGenerator::main_menu')->_addBreadcrumb(__('Install Schema Generator'), __('Install Schema Generator'));
+        
+        //$this->_view->getLayout()->getBlock('installschemagenerator_retriever_edit')->setData('action', $this->getUrl('*/*/retriever', ['_current' => true]));        
+        $this->_view->getPage()->getConfig()->getTitle()->prepend(__('Install Schema Generator'));
+        $this->_view->renderLayout();
     }
 }

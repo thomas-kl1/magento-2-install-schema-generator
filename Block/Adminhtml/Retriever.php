@@ -20,27 +20,21 @@
  */
 namespace Blackbird\InstallSchemaGenerator\Block\Adminhtml;
 
-use Magento\Framework\View\Element\Template;
+use Magento\Backend\Block\Widget\Grid\Container;
 
-/**
- * Retrieve InstallSchema class from tables form block
- */
-class RetrieverForm extends Template
+class Retriever extends Container
 {
     /**
-     * @param Template\Context $context
-     * @param array $data
+     * Constructor
+     *
+     * @return void
      */
-    public function __construct(Template\Context $context, array $data = [], \Magento\Framework\ObjectManagerInterface $objectManager)
+    protected function _construct()
     {
-        parent::__construct($context, $data);
-        $this->_objectManager = $objectManager;
-        $this->_isScopePrivate = true;
-    }
-    
-    public function getTables()
-    {
-        $retriever = $this->_objectManager->create('\Blackbird\InstallSchemaGenerator\Model\Resource\SchemaRetriever');
-        return $retriever->getTables();
+        $this->_blockGroup = 'Blackbird_InstallSchemaGenerator';
+        $this->_controller = 'adminhtml_retriever';
+        $this->_headerText = __('Static Blocks');
+        $this->_addButtonLabel = __('Add New Block');
+        parent::_construct();
     }
 }
