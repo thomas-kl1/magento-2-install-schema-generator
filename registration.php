@@ -1,6 +1,6 @@
 <?php
 /**
- * Blackbird ContentManager Module
+ * Blackbird Install Schema Generator Module
  *
  * NOTICE OF LICENSE
  *
@@ -13,7 +13,7 @@
  * to contact@bird.eu so we can send you a copy immediately.
  *
  * @category            Blackbird
- * @package             Blackbird_ContentManager
+ * @package             Blackbird_InstallSchemaGenerator
  * @copyright           Copyright (c) 2015 Blackbird (http://black.bird.eu)
  * @author              Blackbird Team
  * @license             http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)

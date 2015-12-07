@@ -1,6 +1,6 @@
 <?php
 /**
- * Blackbird InstallSchemaGenerator Module
+ * Blackbird Install Schema Generator Module
  *
  * NOTICE OF LICENSE
  *
