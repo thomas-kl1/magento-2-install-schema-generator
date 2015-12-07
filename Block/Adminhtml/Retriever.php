@@ -33,8 +33,6 @@ class Retriever extends Container
     {
         $this->_blockGroup = 'Blackbird_InstallSchemaGenerator';
         $this->_controller = 'adminhtml_retriever';
-        $this->_headerText = __('Static Blocks');
-        $this->_addButtonLabel = __('Add New Block');
         parent::_construct();
     }
 }

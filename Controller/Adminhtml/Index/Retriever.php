@@ -72,13 +72,15 @@ class Retriever extends Action
         $isPost = $this->getRequest()->getPost();
         
         if($isPost) {
-            $namespace = $this->getRequest()->getParam('namespace');
+            $vendor = $this->getRequest()->getParam('vendor');
+            $module = $this->getRequest()->getParam('module');
+            $namespace = $vendor . '\\' . $module;
             $tables = $this->getRequest()->getParam('tables');
         
             if (!is_array($tables)) {
                 $this->messageManager->addError(__('Please select at least one table.'));
             } else {
-                $retriever = $this->_objectManager->create('Blackbird\InstallSchemaGenerator\Model\Resource\SchemaRetriever');
+                $retriever = $this->_objectManager->create('Blackbird\InstallSchemaGenerator\Model\ResourceModel\SchemaRetriever');
                 $builder = $this->_objectManager->create('Blackbird\InstallSchemaGenerator\Model\SchemaSetupBuilder');
 
                 try {

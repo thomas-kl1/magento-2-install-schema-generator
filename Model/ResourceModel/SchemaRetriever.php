@@ -18,7 +18,7 @@
  * @author		Blackbird Team
  * @license		http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-namespace Blackbird\InstallSchemaGenerator\Model\Resource;
+namespace Blackbird\InstallSchemaGenerator\Model\ResourceModel;
 
 use Magento\Framework\Model\ResourceModel\Db\AbstractDb;
 
@@ -28,10 +28,8 @@ class SchemaRetriever extends AbstractDb
     
     public function _construct()
     {
-        // Load default configuration        
-        //$config = $this->_getReadAdapter()->getConfig();
-        //$this->dbname = $config['dbname'];
-        $this->dbname = 'magento2-acm';
+        $dbConfig = $this->getConnection()->getConfig();
+        $this->dbname = $dbConfig['dbname'];
     }
     
     /**
@@ -44,7 +42,7 @@ class SchemaRetriever extends AbstractDb
                 WHERE TABLE_SCHEMA = '" . $this->dbname . "'";
         
         // Prepare query
-        $fetch = $this->getReadConnection()->fetchAll($sql);
+        $fetch = $this->getConnection()->fetchAll($sql);
         return $fetch;
     }
     
@@ -53,6 +51,7 @@ class SchemaRetriever extends AbstractDb
         $options = array();
         
         foreach ($tables as $table) {
+            $table = $table['TABLE_NAME'];
             $options[] = [
                 'value' => $table,
                 'label' => __($table)
@@ -121,7 +120,7 @@ class SchemaRetriever extends AbstractDb
         $sql .= " ORDER BY C.TABLE_NAME, C.ORDINAL_POSITION";
        
         // Prepare query
-        $schema = $this->getReadConnection()->fetchAll($sql);
+        $schema = $this->getConnection()->fetchAll($sql);
         
         $schema = $this->sanitizeSchema($schema);
         

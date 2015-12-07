@@ -73,7 +73,7 @@ class Tables extends Generic implements TabInterface
     
     public function _prepareForm()
     {
-        $retriever = $this->_objectManager->create('\Blackbird\InstallSchemaGenerator\Model\Resource\SchemaRetriever');
+        $retriever = $this->_objectManager->create('\Blackbird\InstallSchemaGenerator\Model\ResourceModel\SchemaRetriever');
         
         /** @var \Magento\Framework\Data\Form $form */
         $form = $this->_formFactory->create();

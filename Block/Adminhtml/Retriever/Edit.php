@@ -38,23 +38,19 @@ class Edit extends Container
 
         parent::_construct();
         
-        $this->buttonList->remove('save');
-        $this->buttonList->remove('reset');
-        $this->buttonList->remove('back');
-        $this->buttonList->add(
+        $this->removeButton('save');
+        $this->removeButton('reset');
+        $this->removeButton('back');
+        $this->addButton(
             'retrieve',
             [
-                'class' => 'retrieve primary',
                 'label' => __('Retrieve Install Schema'),
+                'class' => 'retrieve primary',
                 'data_attribute' => [
-                    'mage_init' => [
-                        'button' => [
-                            'event' => 'retrieve',
-                            'target' => '#edit_form'
-                        ]
-                    ]
+                    'mage-init' => ['button' => ['event' => 'save', 'target' => '#edit_form']],
                 ]
-            ]
+            ],
+            1
         );
     }
     
