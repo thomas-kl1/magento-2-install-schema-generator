@@ -44,7 +44,7 @@ class Edit extends Container
         $this->addButton(
             'retrieve',
             [
-                'label' => __('Retrieve Install Schema'),
+                'label' => __('Generate and download file'),
                 'class' => 'retrieve primary',
                 'data_attribute' => [
                     'mage-init' => ['button' => ['event' => 'save', 'target' => '#edit_form']],

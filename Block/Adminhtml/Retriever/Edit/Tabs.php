@@ -32,6 +32,6 @@ class Tabs extends \Magento\Backend\Block\Widget\Tabs
         parent::_construct();
         $this->setId('installschemagenerator_retriever_tabs');
         $this->setDestElementId('edit_form');
-        $this->setTitle(__('Retrieve Install Schema'));
+        $this->setTitle(__('Settings'));
     }
 }

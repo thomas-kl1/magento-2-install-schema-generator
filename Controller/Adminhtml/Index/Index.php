@@ -36,8 +36,7 @@ class Index extends Action
         $this->_view->loadLayout();
         
         $this->_setActiveMenu('Blackbird_InstallSchemaGenerator::main_menu')->_addBreadcrumb(__('Install Schema Generator'), __('Install Schema Generator'));
-        
-        //$this->_view->getLayout()->getBlock('installschemagenerator_retriever_edit')->setData('action', $this->getUrl('*/*/retriever', ['_current' => true]));        
+            
         $this->_view->getPage()->getConfig()->getTitle()->prepend(__('Install Schema Generator'));
         $this->_view->renderLayout();
     }

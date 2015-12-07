@@ -64,9 +64,9 @@ class Infos extends Generic implements TabInterface
             'text',
             [
                 'name' => 'vendor',
-                'label' => __('Vendor Name'),
-                'title' => __('Vendor Name'),
-                'note' => __("Vendor name is generally name's company and is the fisert element of your namespace: <Vendor>\<Module>")
+                'label' => __("Vendor's Name"),
+                'title' => __("Vendor's Name"),
+                'note' => __("Vendor's name is generally the name of the company and is the first element of your namespace: &lt;Vendor&gt;\&ltModule&gt;")
             ]
         );
         
@@ -77,7 +77,7 @@ class Infos extends Generic implements TabInterface
                 'name' => 'module',
                 'label' => __('Module Name'),
                 'title' => __('Module Name'),
-                'note' => __("It's the name of your module : <Vendor>\<Module>")
+                'note' => __("It's the name of your module : &lt;Vendor&gt;\&ltModule&gt;")
             ]
         );
         

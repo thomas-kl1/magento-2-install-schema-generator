@@ -81,7 +81,7 @@ class Tables extends Generic implements TabInterface
         
         $fieldset = $form->addFieldset(
             'tables_fieldset',
-            ['legend' => __('Retreive Install Schema from table(s)')]
+            ['legend' => __('Generate InstallSchema.php file from table(s)')]
         );
         
         $fieldset->addField(
@@ -91,7 +91,7 @@ class Tables extends Generic implements TabInterface
                 'name' => 'tables',
                 'label' => __('Tables'),
                 'title' => __('Tables'),
-                'note' => __('Select table(s) to retrieves the schema and make the install setup class.'),
+                'note' => __('Select the table(s) to generate the InstallSchema.php file.'),
                 'required' => true,
                 'values' => $retriever->getTablesOptions()
             ]
