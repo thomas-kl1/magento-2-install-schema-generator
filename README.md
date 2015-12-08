@@ -31,6 +31,14 @@ Once the repository added, run the two following commands:
     composer require blackbird/installschemagenerator
     php bin/magento setup:upgrade
 
+## Usage
+
+You can access to the extension by the following access menu : "SYSTEM" => "Install Schema Generator".
+
+Select the table(s) and click on "Generate and download file" button to generate the InstallSchema.php file.
+
+![alt tag](http://black.bird.eu/media/wysiwyg/images/screen_backend_isg.jpg)
+
 ## Contributors
 
 Thomas Klein ([Blackbird](http://black.bird.eu) team member)
