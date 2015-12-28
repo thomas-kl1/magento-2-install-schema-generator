@@ -72,8 +72,11 @@ class Retriever extends Action
         $isPost = $this->getRequest()->getPost();
         
         if($isPost) {
-            $vendor = $this->getRequest()->getParam('vendor');
-            $module = $this->getRequest()->getParam('module');
+            $vendor = trim($this->getRequest()->getParam('vendor'));
+            $vendor = !empty($vendor) ? $vendor : 'Vendor';
+            $module = trim($this->getRequest()->getParam('module'));
+            $module = !empty($module) ? : 'Module';
+            
             $namespace = $vendor . '\\' . $module;
             $tables = $this->getRequest()->getParam('tables');
         
