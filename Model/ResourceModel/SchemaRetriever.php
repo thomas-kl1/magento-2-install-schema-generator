@@ -24,8 +24,16 @@ use Magento\Framework\Model\ResourceModel\Db\AbstractDb;
 
 class SchemaRetriever extends AbstractDb
 {       
+    /**
+     * The default database name
+     * 
+     * @var string
+     */
     protected $dbname;
     
+    /**
+     * @return void
+     */
     public function _construct()
     {
         $dbConfig = $this->getConnection()->getConfig();
@@ -33,7 +41,7 @@ class SchemaRetriever extends AbstractDb
     }
     
     /**
-     * Get all tables of database
+     * Get all database tables
      * 
      * @return Array
      */
@@ -46,6 +54,11 @@ class SchemaRetriever extends AbstractDb
         return $fetch;
     }
     
+    /**
+     * Retrieve all tables
+     * 
+     * @return array
+     */
     public function getTablesOptions() {
         $tables = $this->getTables();
         $options = array();
@@ -62,14 +75,14 @@ class SchemaRetriever extends AbstractDb
     }
     
     /**
-     * Return schema of tables
+     * Return the tables schema
      * 
      * @param array $tables
      * @return array
      */
     public function getSchema($tables = array())
     {
-        // Select all informations about columns, indexes and foreign keys for table(s)
+        // Select all informations about columns, indexes and foreign keys
         $sql = "SELECT T.TABLE_NAME, T.TABLE_COMMENT,
                        C.COLUMN_NAME, C.COLUMN_COMMENT, C.COLUMN_DEFAULT, C.COLUMN_TYPE, COLUMN_KEY,
                        C.IS_NULLABLE, C.NUMERIC_PRECISION, C.NUMERIC_SCALE, C.DATETIME_PRECISION, C.EXTRA,
@@ -108,7 +121,7 @@ class SchemaRetriever extends AbstractDb
                 
                 WHERE C.TABLE_SCHEMA = '" . $this->dbname . "'";        
         
-        // If tables is empty, columns of all tables will be return
+        // If no specific table is given, we return all database tables
         if (is_array($tables) && !empty($tables)) {
             $sql .= " AND C.TABLE_NAME IN (";
             foreach($tables as $table) {
@@ -119,7 +132,7 @@ class SchemaRetriever extends AbstractDb
         
         $sql .= " ORDER BY C.TABLE_NAME, C.ORDINAL_POSITION";
        
-        // Prepare query
+        // Prepare the query
         $schema = $this->getConnection()->fetchAll($sql);
         
         $schema = $this->sanitizeSchema($schema);
@@ -128,7 +141,7 @@ class SchemaRetriever extends AbstractDb
     }
     
     /**
-     * Sort columns by table in a sub array
+     * Sort the columns by table in a sub array
      * 
      * @param array $schema
      * @return array

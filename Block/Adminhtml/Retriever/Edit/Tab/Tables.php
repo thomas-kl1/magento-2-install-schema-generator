@@ -51,26 +51,43 @@ class Tables extends Generic implements TabInterface
         $this->_objectManager = $objectManager;
     }
     
+    /**
+     * @return string
+     */
     public function getTabLabel()
     {
         return __('Tables');
     }
     
+    /**
+     * @return string
+     */
     public function getTabTitle()
     {
         return __('Tables');
     }
     
+    /**
+     * @return boolean
+     */
     public function canShowTab() 
     {
         return true;
     }
     
+    /**
+     * @return boolean
+     */
     public function isHidden()
     {
         return false;
     }
     
+    /**
+     * Prepare form before rendering HTML
+     *
+     * @return $this
+     */
     public function _prepareForm()
     {
         $retriever = $this->_objectManager->create('\Blackbird\InstallSchemaGenerator\Model\ResourceModel\SchemaRetriever');

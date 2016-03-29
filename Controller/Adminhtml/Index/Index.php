@@ -21,8 +21,6 @@
 namespace Blackbird\InstallSchemaGenerator\Controller\Adminhtml\Index;
 
 use Magento\Backend\App\Action;
-use Magento\Framework\View\Result\PageFactory;
-use Magento\Backend\App\Action\Context;
 
 class Index extends Action
 {    
@@ -31,12 +29,8 @@ class Index extends Action
      */
     public function execute()
     {
-        $resultRedirect = $this->resultRedirectFactory->create();
-        
         $this->_view->loadLayout();
-        
         $this->_setActiveMenu('Blackbird_InstallSchemaGenerator::main_menu')->_addBreadcrumb(__('Install Schema Generator'), __('Install Schema Generator'));
-            
         $this->_view->getPage()->getConfig()->getTitle()->prepend(__('Install Schema Generator'));
         $this->_view->renderLayout();
     }

@@ -45,9 +45,9 @@ class Retriever extends Action
     }
     
     /**
-     * Download file
+     * Download the file
      * 
-     * @param String $fileName
+     * @param string $fileName
      * @param string $content
      */
     protected function download($fileName, $content)
@@ -61,7 +61,7 @@ class Retriever extends Action
     }
     
     /**
-     * Display Install Schema
+     * Download action of the Install Schema script
      *
      * @return void
      * @throws \Exception

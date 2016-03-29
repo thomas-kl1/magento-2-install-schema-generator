@@ -25,18 +25,6 @@ use Magento\Backend\Block\Widget\Form\Generic;
 class Form extends Generic
 {
     /**
-     * Constructor
-     *
-     * @return void
-     */
-    /*protected function _construct()
-    {
-        parent::_construct();
-        $this->setId('installschemagenerator_retriever_form');
-        $this->setTitle(__('Install Schema Informations'));
-    }*/
-
-    /**
      * Prepare form before rendering HTML
      *
      * @return $this
@@ -55,6 +43,7 @@ class Form extends Generic
         );
         $form->setUseContainer(true);
         $this->setForm($form);
+        
         return parent::_prepareForm();
     }
 }

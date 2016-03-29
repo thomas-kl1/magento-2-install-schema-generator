@@ -28,26 +28,43 @@ use Magento\Backend\Block\Widget\Tab\TabInterface;
  */
 class Infos extends Generic implements TabInterface
 {
+    /**
+     * @return string
+     */
     public function getTabLabel()
     {
         return __('Namespace Module');
     }
     
+    /**
+     * @return string
+     */
     public function getTabTitle()
     {
         return __('Namespace Module');
     }
     
+    /**
+     * @return boolean
+     */
     public function canShowTab() 
     {
         return true;
     }
     
+    /**
+     * @return boolean
+     */
     public function isHidden()
     {
         return false;
     }
     
+    /**
+     * Prepare form before rendering HTML
+     *
+     * @return $this
+     */
     public function _prepareForm()
     {
         /** @var \Magento\Framework\Data\Form $form */

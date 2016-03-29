@@ -31,9 +31,10 @@ class SchemaSetupBuilder
     private $bool = ['YES' => 'true', 'NO' => 'false'];
     
     /**
-     * Setup the InstallSchema class for a schema
-     *
+     * Setup the InstallSchema php class for the given database schema
+     * 
      * @param array $schema
+     * @param string $namespace
      * @return string
      */
     public function getSetupBySchema(array $schema, $namespace = '')
@@ -52,6 +53,12 @@ class SchemaSetupBuilder
         return $installSchema;
     }
     
+    /**
+     * If pattern is a part of namespace, then return it, else return false
+     * 
+     * @param string $namespace
+     * @return boolean|string
+     */
     private function isNamespace($namespace)
     {
         $return = (!empty($namespace));
@@ -111,7 +118,7 @@ class SchemaSetupBuilder
     }
     
     /**
-     * Return extra
+     * Return the extra
      *
      * @param string $extra
      * @return string
@@ -129,7 +136,7 @@ class SchemaSetupBuilder
     }
     
     /**
-     * Return key
+     * Return the corresponding key
      *
      * @param string $key
      * @return string
@@ -147,7 +154,7 @@ class SchemaSetupBuilder
     }
     
     /**
-     * Return type and size of the field
+     * Return the type and the size of the field
      *
      * @param string $type
      * @return array
@@ -165,8 +172,6 @@ class SchemaSetupBuilder
         // formalize type for magento 2
         switch ($match) {
             case 'char':
-                $type = 'TEXT';
-                break;
             case 'varchar':
                 $type = 'TEXT';
                 break;
@@ -205,11 +210,7 @@ class SchemaSetupBuilder
                 $type = 'TIMESTAMP';
                 break;
             case 'tinyblob':
-                $type = 'BLOB';
-                break;
             case 'mediumblob':
-                $type = 'BLOB';
-                break;
             case 'longblob':
                 $type = 'BLOB';
                 break;
@@ -220,13 +221,11 @@ class SchemaSetupBuilder
                 $type = strtoupper($match);
         }
         
-        $return = array('type' => $type, 'size' => $size, 'unsigned' => $unsigned);
-        
-        return $return;
+        return ['type' => $type, 'size' => $size, 'unsigned' => $unsigned];
     }
     
     /**
-     * Create Add Index part
+     * Create the Add Index part
      *
      * @param array $columns
      * @return string
@@ -236,7 +235,7 @@ class SchemaSetupBuilder
         $return = '';
         $indexes = array();
         
-        // Sort columns which makes part of same index
+        // Sort columns which are part of the same index
         foreach ($columns as $column) {
             foreach ($column['CONSTRAINTS'] as $constraint) {
                 $idxname = $constraint['INDEX_NAME'];
@@ -266,7 +265,7 @@ class SchemaSetupBuilder
             }
         }
 
-        // Create Add index parts
+        // Create the Add index parts
         foreach ($indexes as $idxname=>$index) {
             $tabName = '';
             $tabColumns = "[";
@@ -283,7 +282,7 @@ class SchemaSetupBuilder
                 $type = '';
             }
             
-            // Create Add Index part
+            // Create the Add Index part
             $return .= "\t\t\t->addIndex(" . PHP_EOL;
             $return .= "\t\t\t\t\$installer->getIdxName(" . PHP_EOL;
             $return .= "\t\t\t\t\t'" . $tabName . "'," . PHP_EOL;
@@ -303,7 +302,7 @@ class SchemaSetupBuilder
     }
     
     /**
-     * Create Add Foreign Key part
+     * Create the Add Foreign Key part
      *
      * @param array $column
      * @return string
@@ -321,7 +320,7 @@ class SchemaSetupBuilder
             $rf_columnname = $constraint['REFERENCED_COLUMN_NAME'];
             
             if (!empty($fk_name) && !empty($rf_tablename) && !empty($rf_columnname) && $is_fk) {
-                // Set action on delete
+                // Set the action for the delete rule
                 $action = 'ACTION_' . str_replace(" ", "_", strtoupper($constraint['DELETE_RULE']));
                 
                 $return .= "\t\t\t->addForeignKey(" . PHP_EOL;
@@ -343,7 +342,7 @@ class SchemaSetupBuilder
     }
     
     /**
-     * Create Add Column part
+     * Create the Add Column part
      *
      * @param array $column
      * @return string
@@ -370,7 +369,7 @@ class SchemaSetupBuilder
         // Comment
         $comment = !empty($column['COLUMN_COMMENT']) ? "'" . $column['COLUMN_COMMENT'] . "'" : "null";
      
-        // Add options
+        // Add the options
         $options = [
             'unsigned' => $typesize['unsigned'],
             'default' => $column['COLUMN_DEFAULT'],
@@ -382,7 +381,7 @@ class SchemaSetupBuilder
         ];
         $options = $this->getOptions($options);
         
-        // Add a new column with prop
+        // Add a new column with their properties
         $return = "\t\t\t->addColumn(" . PHP_EOL;                    
         $return .= "\t\t\t\t'" . $column['COLUMN_NAME'] . "'," . PHP_EOL;
         $return .= "\t\t\t\t\Magento\Framework\DB\Ddl\Table::TYPE_" . $type . "," . PHP_EOL;
@@ -395,7 +394,7 @@ class SchemaSetupBuilder
     }
     
     /**
-     * Create New Table part
+     * Create the New Table part
      *
      * @param string $name
      * @param array $table
@@ -410,16 +409,16 @@ class SchemaSetupBuilder
         $return .= "\t\t\$table = \$installer->getConnection()" . PHP_EOL;
         $return .= "\t\t\t->newTable(\$installer->getTable('" . $name . "'))" . PHP_EOL;
         
-        // Add Columns
+        // Add the Columns
         foreach ($table as $column) {
             $return .= $this->getAddColumn($column);
             $comment = !empty($column['TABLE_COMMENT']) ? $column['TABLE_COMMENT'] : $column['TABLE_NAME'];
         }
         
-        // Add Indexes
+        // Add the Indexes
         $return .= $this->getAddIndexes($table);
         
-        // Add Foreign Keys
+        // Add the Foreign Keys
         foreach ($table as $column) {
             $return .= $this->getAddForeignKey($column);
         }
@@ -432,8 +431,9 @@ class SchemaSetupBuilder
     }
     
     /**
-     * Create header of InstallSchema
+     * Create the header of the InstallSchema script
      *
+     * @param string $namespace
      * @return string
      */
     private function getHeader($namespace)
@@ -459,7 +459,7 @@ class SchemaSetupBuilder
     }
     
     /**
-     * Create footer of InstallSchema
+     * Create the footer of the InstallSchema script
      *
      * @return string
      */
