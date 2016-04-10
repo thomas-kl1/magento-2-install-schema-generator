@@ -1,3 +1,7 @@
+# Install Schema Generator
+
+**A Magento 2 extension**
+
 ## Synopsis
 
 This project is a developer tool destined to speed up the tables creation's scripts of a Magento 2 module.
