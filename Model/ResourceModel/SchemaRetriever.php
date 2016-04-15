@@ -81,7 +81,7 @@ class SchemaRetriever extends AbstractDb
      * @return array
      */
     public function getSchema($tables = array())
-    {
+    {        
         // Select all informations about columns, indexes and foreign keys
         $sql = "SELECT T.TABLE_NAME, T.TABLE_COMMENT,
                        C.COLUMN_NAME, C.COLUMN_COMMENT, C.COLUMN_DEFAULT, C.COLUMN_TYPE, COLUMN_KEY,

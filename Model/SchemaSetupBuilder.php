@@ -143,11 +143,11 @@ class SchemaSetupBuilder
      */
     private function getKey($key)
     {
+        $key = null;
+        
         // PRI, UNI, MUL
         if ($key === 'PRI') {
             $key = 'primary';
-        } else {
-            $key = null;
         }
         
         return $key;
@@ -170,58 +170,82 @@ class SchemaSetupBuilder
         $size = (!empty($matches[2])) ? $matches[2] : 'null';
         
         // formalize type for magento 2
-        switch ($match) {
-            case 'char':
-            case 'varchar':
-                $type = 'TEXT';
-                break;
-            case 'text':
-                $type = 'TEXT';
-                $size = '16000';
-                break;
-            case 'tinytext':
-                $type = 'TEXT';
-                $size = '255';
-                break;
-            case 'mediumtext':
-                $type = 'TEXT';
-                $size = '16000000';
-                break;
-            case 'longtext':
-                $type = 'TEXT';
-                $size = '16000000000';
-                break;
-            case 'int':
-                $type = 'INTEGER';
-                break;
-            case 'tinyint':
-                $type = 'SMALLINT';
-                break;
-            case 'mediumint':
-                $type = 'INTEGER';
-                break;
-            case 'double':
-                $type = 'FLOAT';
-                break;
-            case 'real':
-                $type = 'FLOAT';
-                break;
-            case 'time':
-                $type = 'TIMESTAMP';
-                break;
-            case 'tinyblob':
-            case 'mediumblob':
-            case 'longblob':
-                $type = 'BLOB';
-                break;
-            case 'binary':
-                $type = 'VARBINARY';
-                break;
-            default:
-                $type = strtoupper($match);
+        $type = $this->getRealType($match);
+        $type = $type['type'];
+        $size = (isset($type['size'])) ? $type['size'] : $size;
+                
+        return ['type' => $type, 'size' => $size, 'unsigned' => $unsigned];
+    }
+    
+    /**
+     * Returns the type and size by mysql type
+     * 
+     * @return array
+     */
+    private function getRealType($type)
+    {
+        $result = ['type' => strtoupper($type)];
+        
+        $types = [
+            'char' => [
+                'type' => 'TEXT',
+            ],
+            'varchar' => [
+                'type' => 'TEXT',
+            ],
+            'text' => [
+                'type' => 'TEXT',
+                'size' => '16000',
+            ],
+            'tinytext' => [
+                'type' => 'TEXT',
+                'size' => '255',
+            ],
+            'mediumtext' => [
+                'type' => 'TEXT',
+                'size' => '16000000',
+            ],
+            'longtext' => [
+                'type' => 'TEXT',
+                'size' => '16000000000',
+            ],
+            'int' => [
+                'type' => 'INTEGER',
+            ],
+            'tinyint' => [
+                'type' => 'SMALLINT',
+            ],                
+            'mediumint' => [
+                'type' => 'INTEGER',
+            ],
+            'double' => [
+                'type' => 'FLOAT',
+            ],
+            'real' => [
+                'type' => 'FLOAT',
+            ],
+            'time' => [
+                'type' => 'TIMESTAMP',
+            ],
+            'tinyblob' => [
+                'type' => 'BLOB',
+            ],
+            'mediumblob' => [
+                'type' => 'BLOB',
+            ],
+            'longblob' => [
+                'type' => 'BLOB',
+            ],
+            'binary' => [
+                'type' => 'VARBINARY',
+            ]
+        ];
+            
+        if (isset($types[$type])) {
+            $result = $types[$type];
         }
         
-        return ['type' => $type, 'size' => $size, 'unsigned' => $unsigned];
+        return $result;
     }
     
     /**
@@ -242,10 +266,10 @@ class SchemaSetupBuilder
                 $constType = $constraint['CONSTRAINT_TYPE'];
                 $indexType = $constraint['INDEX_TYPE'];
                 // Primary and foreign are index, we only search unique, fulltext and simple index
-                $is_index = ($constType !== 'PRIMARY KEY' && $constType !== 'FOREIGN KEY' && $idxname !== 'PRIMARY' && !empty($indexType));
+                $isIndex = ($constType !== 'PRIMARY KEY' && $constType !== 'FOREIGN KEY' && $idxname !== 'PRIMARY' && !empty($indexType));
                 
                 // If it's an index
-                if (!empty($idxname) && empty($constraint['REFERENCED_TABLE_NAME']) && empty($constraint['REFERENCED_COLUMN_NAME']) && $is_index) {
+                if (!empty($idxname) && empty($constraint['REFERENCED_TABLE_NAME']) && empty($constraint['REFERENCED_COLUMN_NAME']) && $isIndex) {
                     
                     if (!isset($indexes[$idxname])) {
                         $indexes[$idxname] = array();
@@ -312,27 +336,27 @@ class SchemaSetupBuilder
         $return = '';
         
         foreach ($column['CONSTRAINTS'] as $constraint) {
-            $is_fk = !empty($constraint['DELETE_RULE']);
-            $fk_name = $constraint['CONSTRAINT_NAME'];
-            $fk_tablename = $column['TABLE_NAME'];
-            $fk_columnname = $column['COLUMN_NAME'];
-            $rf_tablename = $constraint['REFERENCED_TABLE_NAME'];
-            $rf_columnname = $constraint['REFERENCED_COLUMN_NAME'];
+            $isFk = !empty($constraint['DELETE_RULE']);
+            $fkName = $constraint['CONSTRAINT_NAME'];
+            $fkTablename = $column['TABLE_NAME'];
+            $fkColumnname = $column['COLUMN_NAME'];
+            $rfTablename = $constraint['REFERENCED_TABLE_NAME'];
+            $rfColumnname = $constraint['REFERENCED_COLUMN_NAME'];
             
-            if (!empty($fk_name) && !empty($rf_tablename) && !empty($rf_columnname) && $is_fk) {
+            if (!empty($fkName) && !empty($rfTablename) && !empty($rfColumnname) && $isFk) {
                 // Set the action for the delete rule
                 $action = 'ACTION_' . str_replace(" ", "_", strtoupper($constraint['DELETE_RULE']));
                 
                 $return .= "\t\t\t->addForeignKey(" . PHP_EOL;
                 $return .= "\t\t\t\t\$installer->getFkName(" . PHP_EOL;
-                $return .= "\t\t\t\t\t'" . $fk_tablename . "'," . PHP_EOL;
-                $return .= "\t\t\t\t\t'" . $fk_columnname . "'," . PHP_EOL;
-                $return .= "\t\t\t\t\t'" . $rf_tablename . "'," . PHP_EOL;
-                $return .= "\t\t\t\t\t'" . $rf_columnname . "'" . PHP_EOL;
+                $return .= "\t\t\t\t\t'" . $fkTablename . "'," . PHP_EOL;
+                $return .= "\t\t\t\t\t'" . $fkColumnname . "'," . PHP_EOL;
+                $return .= "\t\t\t\t\t'" . $rfTablename . "'," . PHP_EOL;
+                $return .= "\t\t\t\t\t'" . $rfColumnname . "'" . PHP_EOL;
                 $return .= "\t\t\t\t)," . PHP_EOL;
-                $return .= "\t\t\t\t'" . $fk_columnname . "'," . PHP_EOL;
-                $return .= "\t\t\t\t\$installer->getTable('" . $rf_tablename . "')," . PHP_EOL;
-                $return .= "\t\t\t\t'" . $rf_columnname . "'," . PHP_EOL;
+                $return .= "\t\t\t\t'" . $fkColumnname . "'," . PHP_EOL;
+                $return .= "\t\t\t\t\$installer->getTable('" . $rfTablename . "')," . PHP_EOL;
+                $return .= "\t\t\t\t'" . $rfColumnname . "'," . PHP_EOL;
                 $return .= "\t\t\t\t\\Magento\\Framework\\DB\Ddl\Table::" . $action . PHP_EOL;
                 $return .= "\t\t\t)" . PHP_EOL;
             }
