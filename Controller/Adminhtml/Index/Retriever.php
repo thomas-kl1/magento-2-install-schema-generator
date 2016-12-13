@@ -21,8 +21,9 @@
 namespace Blackbird\InstallSchemaGenerator\Controller\Adminhtml\Index;
 
 use Magento\Framework\App\Filesystem\DirectoryList;
+use Magento\Backend\App\Action;
 
-class Post extends \Magento\Backend\App\Action
+class Retriever extends Action
 {
     /**
      * @var \Magento\Framework\App\Response\Http\FileFactory
@@ -44,9 +45,9 @@ class Post extends \Magento\Backend\App\Action
     }
     
     /**
-     * Download file
+     * Download the file
      * 
-     * @param String $fileName
+     * @param string $fileName
      * @param string $content
      */
     protected function download($fileName, $content)
@@ -60,37 +61,43 @@ class Post extends \Magento\Backend\App\Action
     }
     
     /**
-     * Display Install Schema
+     * Download action of the Install Schema script
      *
      * @return void
      * @throws \Exception
      */
     public function execute()
     {
+        $resultRedirect = $this->resultRedirectFactory->create();
         $isPost = $this->getRequest()->getPost();
         
         if($isPost) {
+            $vendor = trim($this->getRequest()->getParam('vendor'));
+            $vendor = !empty($vendor) ? $vendor : 'Vendor';
+            $module = trim($this->getRequest()->getParam('module'));
+            $module = !empty($module) ? $module : 'Module';
+            
+            $namespace = $vendor . '\\' . $module;
             $tables = $this->getRequest()->getParam('tables');
         
             if (!is_array($tables)) {
                 $this->messageManager->addError(__('Please select at least one table.'));
             } else {
-                $retriever = $this->_objectManager->create('Blackbird\InstallSchemaGenerator\Model\Resource\SchemaRetriever');
+                $retriever = $this->_objectManager->create('Blackbird\InstallSchemaGenerator\Model\ResourceModel\SchemaRetriever');
                 $builder = $this->_objectManager->create('Blackbird\InstallSchemaGenerator\Model\SchemaSetupBuilder');
 
                 try {
                     $schema = $retriever->getSchema($tables);
-                    $result = $builder->getSetupBySchema($schema);
+                    $result = $builder->getSetupBySchema($schema, $namespace);
                 } catch (\Exception $e) {
                     $this->messageManager->addError($e->getMessage());
                 }
 
-                $this->download('InstallSchemaTESTING.php', $result);
+                $this->download('InstallSchema.php', $result);
                 $this->messageManager->addSuccess(__('Your InstallSchema.php is downloading !'));   
             }
         }
         
-        $this->_redirect('*/*/index');
-        return;
+        return $resultRedirect->setPath('*/*/');
     }
 }

@@ -18,20 +18,32 @@
  * @author		Blackbird Team
  * @license		http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-namespace Blackbird\InstallSchemaGenerator\Controller\Adminhtml\Index;
+namespace Blackbird\InstallSchemaGenerator\Block\Adminhtml\Retriever\Edit;
 
-use Magento\Backend\App\Action;
+use Magento\Backend\Block\Widget\Form\Generic;
 
-class Index extends Action
-{    
+class Form extends Generic
+{
     /**
-     * @return void
+     * Prepare form before rendering HTML
+     *
+     * @return $this
      */
-    public function execute()
+    protected function _prepareForm()
     {
-        $this->_view->loadLayout();
-        $this->_setActiveMenu('Blackbird_InstallSchemaGenerator::main_menu')->_addBreadcrumb(__('Install Schema Generator'), __('Install Schema Generator'));
-        $this->_view->getPage()->getConfig()->getTitle()->prepend(__('Install Schema Generator'));
-        $this->_view->renderLayout();
+        /** @var \Magento\Framework\Data\Form $form */
+        $form = $this->_formFactory->create(
+            [
+                'data' => [
+                    'id' => 'edit_form',
+                    'action' => $this->getUrl('*/*/retriever', ['_current' => true]),
+                    'method' => 'post',
+                ],
+            ]
+        );
+        $form->setUseContainer(true);
+        $this->setForm($form);
+        
+        return parent::_prepareForm();
     }
 }

@@ -18,29 +18,20 @@
  * @author		Blackbird Team
  * @license		http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-namespace Blackbird\InstallSchemaGenerator\Block\Adminhtml;
+namespace Blackbird\InstallSchemaGenerator\Block\Adminhtml\Retriever\Edit;
 
-use Magento\Framework\View\Element\Template;
-
-/**
- * Retrieve InstallSchema class from tables form block
- */
-class RetrieverForm extends Template
-{
+class Tabs extends \Magento\Backend\Block\Widget\Tabs
+{    
     /**
-     * @param Template\Context $context
-     * @param array $data
+     * Constructor
+     *
+     * @return void
      */
-    public function __construct(Template\Context $context, array $data = [], \Magento\Framework\ObjectManagerInterface $objectManager)
+    protected function _construct()
     {
-        parent::__construct($context, $data);
-        $this->_objectManager = $objectManager;
-        $this->_isScopePrivate = true;
-    }
-    
-    public function getTables()
-    {
-        $retriever = $this->_objectManager->create('\Blackbird\InstallSchemaGenerator\Model\Resource\SchemaRetriever');
-        return $retriever->getTables();
+        parent::_construct();
+        $this->setId('installschemagenerator_retriever_tabs');
+        $this->setDestElementId('edit_form');
+        $this->setTitle(__('Settings'));
     }
 }

@@ -18,20 +18,21 @@
  * @author		Blackbird Team
  * @license		http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-namespace Blackbird\InstallSchemaGenerator\Controller\Adminhtml\Index;
+namespace Blackbird\InstallSchemaGenerator\Block\Adminhtml;
 
-use Magento\Backend\App\Action;
+use Magento\Backend\Block\Widget\Grid\Container;
 
-class Index extends Action
-{    
+class Retriever extends Container
+{
     /**
+     * Constructor
+     *
      * @return void
      */
-    public function execute()
+    protected function _construct()
     {
-        $this->_view->loadLayout();
-        $this->_setActiveMenu('Blackbird_InstallSchemaGenerator::main_menu')->_addBreadcrumb(__('Install Schema Generator'), __('Install Schema Generator'));
-        $this->_view->getPage()->getConfig()->getTitle()->prepend(__('Install Schema Generator'));
-        $this->_view->renderLayout();
+        $this->_blockGroup = 'Blackbird_InstallSchemaGenerator';
+        $this->_controller = 'adminhtml_retriever';
+        parent::_construct();
     }
 }

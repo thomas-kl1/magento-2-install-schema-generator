@@ -31,14 +31,18 @@ class SchemaSetupBuilder
     private $bool = ['YES' => 'true', 'NO' => 'false'];
     
     /**
-     * Setup the InstallSchema class for a schema
-     *
+     * Setup the InstallSchema php class for the given database schema
+     * 
      * @param array $schema
+     * @param string $namespace
      * @return string
      */
-    public function getSetupBySchema($schema)
+    public function getSetupBySchema(array $schema, $namespace = '')
     {
-        $installSchema = $this->getHeader();
+        if (!$this->isNamespace($namespace)) {
+            $namespace = "Vendor\Area";
+        }
+        $installSchema = $this->getHeader($namespace);
         
         foreach ($schema as $name=>$table) {
             $installSchema .= $this->getNewTable($name, $table);
@@ -47,6 +51,23 @@ class SchemaSetupBuilder
         $installSchema .= $this->getFooter();
         
         return $installSchema;
+    }
+    
+    /**
+     * If pattern is a part of namespace, then return it, else return false
+     * 
+     * @param string $namespace
+     * @return boolean|string
+     */
+    private function isNamespace($namespace)
+    {
+        $return = (!empty($namespace));
+        
+        if ($return) {
+            $return = (count(explode("\\", $namespace)) === 2);
+        }
+        
+        return $return;
     }
     
     /**
@@ -97,7 +118,7 @@ class SchemaSetupBuilder
     }
     
     /**
-     * Return extra
+     * Return the extra
      *
      * @param string $extra
      * @return string
@@ -115,25 +136,25 @@ class SchemaSetupBuilder
     }
     
     /**
-     * Return key
+     * Return the corresponding key
      *
      * @param string $key
      * @return string
      */
     private function getKey($key)
     {
+        $key = null;
+        
         // PRI, UNI, MUL
         if ($key === 'PRI') {
             $key = 'primary';
-        } else {
-            $key = null;
         }
         
         return $key;
     }
     
     /**
-     * Return type and size of the field
+     * Return the type and the size of the field
      *
      * @param string $type
      * @return array
@@ -149,70 +170,86 @@ class SchemaSetupBuilder
         $size = (!empty($matches[2])) ? $matches[2] : 'null';
         
         // formalize type for magento 2
-        switch ($match) {
-            case 'char':
-                $type = 'TEXT';
-                break;
-            case 'varchar':
-                $type = 'TEXT';
-                break;
-            case 'text':
-                $type = 'TEXT';
-                $size = '16000';
-                break;
-            case 'tinytext':
-                $type = 'TEXT';
-                $size = '255';
-                break;
-            case 'mediumtext':
-                $type = 'TEXT';
-                $size = '16000000';
-                break;
-            case 'longtext':
-                $type = 'TEXT';
-                $size = '16000000000';
-                break;
-            case 'int':
-                $type = 'INTEGER';
-                break;
-            case 'tinyint':
-                $type = 'SMALLINT';
-                break;
-            case 'mediumint':
-                $type = 'INTEGER';
-                break;
-            case 'double':
-                $type = 'FLOAT';
-                break;
-            case 'real':
-                $type = 'FLOAT';
-                break;
-            case 'time':
-                $type = 'TIMESTAMP';
-                break;
-            case 'tinyblob':
-                $type = 'BLOB';
-                break;
-            case 'mediumblob':
-                $type = 'BLOB';
-                break;
-            case 'longblob':
-                $type = 'BLOB';
-                break;
-            case 'binary':
-                $type = 'VARBINARY';
-                break;
-            default:
-                $type = strtoupper($match);
-        }
-        
-        $return = array('type' => $type, 'size' => $size, 'unsigned' => $unsigned);
-        
-        return $return;
+        $type = $this->getRealType($match);
+        $type = $type['type'];
+        $size = (isset($type['size'])) ? $type['size'] : $size;
+                
+        return ['type' => $type, 'size' => $size, 'unsigned' => $unsigned];
     }
     
     /**
-     * Create Add Index part
+     * Returns the type and size by mysql type
+     * 
+     * @return array
+     */
+    private function getRealType($type)
+    {
+        $result = ['type' => strtoupper($type)];
+        
+        $types = [
+            'char' => [
+                'type' => 'TEXT',
+            ],
+            'varchar' => [
+                'type' => 'TEXT',
+            ],
+            'text' => [
+                'type' => 'TEXT',
+                'size' => '16000',
+            ],
+            'tinytext' => [
+                'type' => 'TEXT',
+                'size' => '255',
+            ],
+            'mediumtext' => [
+                'type' => 'TEXT',
+                'size' => '16000000',
+            ],
+            'longtext' => [
+                'type' => 'TEXT',
+                'size' => '16000000000',
+            ],
+            'int' => [
+                'type' => 'INTEGER',
+            ],
+            'tinyint' => [
+                'type' => 'SMALLINT',
+            ],                
+            'mediumint' => [
+                'type' => 'INTEGER',
+            ],
+            'double' => [
+                'type' => 'FLOAT',
+            ],
+            'real' => [
+                'type' => 'FLOAT',
+            ],
+            'time' => [
+                'type' => 'TIMESTAMP',
+            ],
+            'tinyblob' => [
+                'type' => 'BLOB',
+            ],
+            'mediumblob' => [
+                'type' => 'BLOB',
+            ],
+            'longblob' => [
+                'type' => 'BLOB',
+            ],
+            'binary' => [
+                'type' => 'VARBINARY',
+            ]
+        ];
+            
+        if (isset($types[$type])) {
+            $result = $types[$type];
+        }
+        
+        return $result;
+    }
+    
+    /**
+     * Create the Add Index part
      *
      * @param array $columns
      * @return string
@@ -222,17 +259,17 @@ class SchemaSetupBuilder
         $return = '';
         $indexes = array();
         
-        // Sort columns which makes part of same index
+        // Sort columns which are part of the same index
         foreach ($columns as $column) {
             foreach ($column['CONSTRAINTS'] as $constraint) {
                 $idxname = $constraint['INDEX_NAME'];
                 $constType = $constraint['CONSTRAINT_TYPE'];
                 $indexType = $constraint['INDEX_TYPE'];
                 // Primary and foreign are index, we only search unique, fulltext and simple index
-                $is_index = ($constType !== 'PRIMARY KEY' && $constType !== 'FOREIGN KEY' && $idxname !== 'PRIMARY' && !empty($indexType));
+                $isIndex = ($constType !== 'PRIMARY KEY' && $constType !== 'FOREIGN KEY' && $idxname !== 'PRIMARY' && !empty($indexType));
                 
                 // If it's an index
-                if (!empty($idxname) && empty($constraint['REFERENCED_TABLE_NAME']) && empty($constraint['REFERENCED_COLUMN_NAME']) && $is_index) {
+                if (!empty($idxname) && empty($constraint['REFERENCED_TABLE_NAME']) && empty($constraint['REFERENCED_COLUMN_NAME']) && $isIndex) {
                     
                     if (!isset($indexes[$idxname])) {
                         $indexes[$idxname] = array();
@@ -252,7 +289,7 @@ class SchemaSetupBuilder
             }
         }
 
-        // Create Add index parts
+        // Create the Add index parts
         foreach ($indexes as $idxname=>$index) {
             $tabName = '';
             $tabColumns = "[";
@@ -269,7 +306,7 @@ class SchemaSetupBuilder
                 $type = '';
             }
             
-            // Create Add Index part
+            // Create the Add Index part
             $return .= "\t\t\t->addIndex(" . PHP_EOL;
             $return .= "\t\t\t\t\$installer->getIdxName(" . PHP_EOL;
             $return .= "\t\t\t\t\t'" . $tabName . "'," . PHP_EOL;
@@ -289,7 +326,7 @@ class SchemaSetupBuilder
     }
     
     /**
-     * Create Add Foreign Key part
+     * Create the Add Foreign Key part
      *
      * @param array $column
      * @return string
@@ -299,27 +336,27 @@ class SchemaSetupBuilder
         $return = '';
         
         foreach ($column['CONSTRAINTS'] as $constraint) {
-            $is_fk = !empty($constraint['DELETE_RULE']);
-            $fk_name = $constraint['CONSTRAINT_NAME'];
-            $fk_tablename = $column['TABLE_NAME'];
-            $fk_columnname = $column['COLUMN_NAME'];
-            $rf_tablename = $constraint['REFERENCED_TABLE_NAME'];
-            $rf_columnname = $constraint['REFERENCED_COLUMN_NAME'];
+            $isFk = !empty($constraint['DELETE_RULE']);
+            $fkName = $constraint['CONSTRAINT_NAME'];
+            $fkTablename = $column['TABLE_NAME'];
+            $fkColumnname = $column['COLUMN_NAME'];
+            $rfTablename = $constraint['REFERENCED_TABLE_NAME'];
+            $rfColumnname = $constraint['REFERENCED_COLUMN_NAME'];
             
-            if (!empty($fk_name) && !empty($rf_tablename) && !empty($rf_columnname) && $is_fk) {
-                // Set action on delete
+            if (!empty($fkName) && !empty($rfTablename) && !empty($rfColumnname) && $isFk) {
+                // Set the action for the delete rule
                 $action = 'ACTION_' . str_replace(" ", "_", strtoupper($constraint['DELETE_RULE']));
                 
                 $return .= "\t\t\t->addForeignKey(" . PHP_EOL;
                 $return .= "\t\t\t\t\$installer->getFkName(" . PHP_EOL;
-                $return .= "\t\t\t\t\t'" . $fk_tablename . "'," . PHP_EOL;
-                $return .= "\t\t\t\t\t'" . $fk_columnname . "'," . PHP_EOL;
-                $return .= "\t\t\t\t\t'" . $rf_tablename . "'," . PHP_EOL;
-                $return .= "\t\t\t\t\t'" . $rf_columnname . "'" . PHP_EOL;
+                $return .= "\t\t\t\t\t'" . $fkTablename . "'," . PHP_EOL;
+                $return .= "\t\t\t\t\t'" . $fkColumnname . "'," . PHP_EOL;
+                $return .= "\t\t\t\t\t'" . $rfTablename . "'," . PHP_EOL;
+                $return .= "\t\t\t\t\t'" . $rfColumnname . "'" . PHP_EOL;
                 $return .= "\t\t\t\t)," . PHP_EOL;
-                $return .= "\t\t\t\t'" . $fk_columnname . "'," . PHP_EOL;
-                $return .= "\t\t\t\t\$installer->getTable('" . $rf_tablename . "')," . PHP_EOL;
-                $return .= "\t\t\t\t'" . $rf_columnname . "'," . PHP_EOL;
+                $return .= "\t\t\t\t'" . $fkColumnname . "'," . PHP_EOL;
+                $return .= "\t\t\t\t\$installer->getTable('" . $rfTablename . "')," . PHP_EOL;
+                $return .= "\t\t\t\t'" . $rfColumnname . "'," . PHP_EOL;
                 $return .= "\t\t\t\t\\Magento\\Framework\\DB\Ddl\Table::" . $action . PHP_EOL;
                 $return .= "\t\t\t)" . PHP_EOL;
             }
@@ -329,7 +366,7 @@ class SchemaSetupBuilder
     }
     
     /**
-     * Create Add Column part
+     * Create the Add Column part
      *
      * @param array $column
      * @return string
@@ -356,7 +393,7 @@ class SchemaSetupBuilder
         // Comment
         $comment = !empty($column['COLUMN_COMMENT']) ? "'" . $column['COLUMN_COMMENT'] . "'" : "null";
      
-        // Add options
+        // Add the options
         $options = [
             'unsigned' => $typesize['unsigned'],
             'default' => $column['COLUMN_DEFAULT'],
@@ -368,7 +405,7 @@ class SchemaSetupBuilder
         ];
         $options = $this->getOptions($options);
         
-        // Add a new column with prop
+        // Add a new column with their properties
         $return = "\t\t\t->addColumn(" . PHP_EOL;                    
         $return .= "\t\t\t\t'" . $column['COLUMN_NAME'] . "'," . PHP_EOL;
         $return .= "\t\t\t\t\Magento\Framework\DB\Ddl\Table::TYPE_" . $type . "," . PHP_EOL;
@@ -381,7 +418,7 @@ class SchemaSetupBuilder
     }
     
     /**
-     * Create New Table part
+     * Create the New Table part
      *
      * @param string $name
      * @param array $table
@@ -396,16 +433,16 @@ class SchemaSetupBuilder
         $return .= "\t\t\$table = \$installer->getConnection()" . PHP_EOL;
         $return .= "\t\t\t->newTable(\$installer->getTable('" . $name . "'))" . PHP_EOL;
         
-        // Add Columns
+        // Add the Columns
         foreach ($table as $column) {
             $return .= $this->getAddColumn($column);
             $comment = !empty($column['TABLE_COMMENT']) ? $column['TABLE_COMMENT'] : $column['TABLE_NAME'];
         }
         
-        // Add Indexes
+        // Add the Indexes
         $return .= $this->getAddIndexes($table);
         
-        // Add Foreign Keys
+        // Add the Foreign Keys
         foreach ($table as $column) {
             $return .= $this->getAddForeignKey($column);
         }
@@ -418,14 +455,15 @@ class SchemaSetupBuilder
     }
     
     /**
-     * Create header of InstallSchema
+     * Create the header of the InstallSchema script
      *
+     * @param string $namespace
      * @return string
      */
-    private function getHeader()
+    private function getHeader($namespace)
     {
         $return = "<?php" . PHP_EOL;
-        $return .= "namespace Vendor\Area\Setup;" . PHP_EOL;
+        $return .= "namespace " . $namespace . "\Setup;" . PHP_EOL;
         $return .= PHP_EOL;
         $return .= "use Magento\Framework\Setup\InstallSchemaInterface;" . PHP_EOL;
         $return .= "use Magento\Framework\Setup\ModuleContextInterface;" . PHP_EOL;
@@ -445,7 +483,7 @@ class SchemaSetupBuilder
     }
     
     /**
-     * Create footer of InstallSchema
+     * Create the footer of the InstallSchema script
      *
      * @return string
      */

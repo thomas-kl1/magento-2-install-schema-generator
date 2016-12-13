@@ -18,23 +18,30 @@
  * @author		Blackbird Team
  * @license		http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-namespace Blackbird\InstallSchemaGenerator\Model\Resource;
+namespace Blackbird\InstallSchemaGenerator\Model\ResourceModel;
 
-use Magento\Framework\Model\Resource\Db\AbstractDb;
+use Magento\Framework\Model\ResourceModel\Db\AbstractDb;
 
 class SchemaRetriever extends AbstractDb
 {       
+    /**
+     * The default database name
+     * 
+     * @var string
+     */
     protected $dbname;
     
+    /**
+     * @return void
+     */
     public function _construct()
     {
-        // Load default configuration
-        $test = include '/app/etc/env.php';
-        $this->dbname = $test['db']['connection']['default']['dbname'];
+        $dbConfig = $this->getConnection()->getConfig();
+        $this->dbname = $dbConfig['dbname'];
     }
     
     /**
-     * Get all tables of database
+     * Get all database tables
      * 
      * @return Array
      */
@@ -43,19 +50,39 @@ class SchemaRetriever extends AbstractDb
                 WHERE TABLE_SCHEMA = '" . $this->dbname . "'";
         
         // Prepare query
-        $fetch = $this->getReadConnection()->fetchAll($sql);
+        $fetch = $this->getConnection()->fetchAll($sql);
         return $fetch;
     }
     
     /**
-     * Return schema of tables
+     * Retrieve all tables
+     * 
+     * @return array
+     */
+    public function getTablesOptions() {
+        $tables = $this->getTables();
+        $options = array();
+        
+        foreach ($tables as $table) {
+            $table = $table['TABLE_NAME'];
+            $options[] = [
+                'value' => $table,
+                'label' => __($table)
+            ];
+        }
+        
+        return $options;
+    }
+    
+    /**
+     * Return the tables schema
      * 
      * @param array $tables
      * @return array
      */
     public function getSchema($tables = array())
-    {
-        // Select all informations about columns, indexes and foreign keys for table(s)
+    {        
+        // Select all informations about columns, indexes and foreign keys
         $sql = "SELECT T.TABLE_NAME, T.TABLE_COMMENT,
                        C.COLUMN_NAME, C.COLUMN_COMMENT, C.COLUMN_DEFAULT, C.COLUMN_TYPE, COLUMN_KEY,
                        C.IS_NULLABLE, C.NUMERIC_PRECISION, C.NUMERIC_SCALE, C.DATETIME_PRECISION, C.EXTRA,
@@ -94,7 +121,7 @@ class SchemaRetriever extends AbstractDb
                 
                 WHERE C.TABLE_SCHEMA = '" . $this->dbname . "'";        
         
-        // If tables is empty, columns of all tables will be return
+        // If no specific table is given, we return all database tables
         if (is_array($tables) && !empty($tables)) {
             $sql .= " AND C.TABLE_NAME IN (";
             foreach($tables as $table) {
@@ -105,8 +132,8 @@ class SchemaRetriever extends AbstractDb
         
         $sql .= " ORDER BY C.TABLE_NAME, C.ORDINAL_POSITION";
        
-        // Prepare query
-        $schema = $this->getReadConnection()->fetchAll($sql);
+        // Prepare the query
+        $schema = $this->getConnection()->fetchAll($sql);
         
         $schema = $this->sanitizeSchema($schema);
         
@@ -114,7 +141,7 @@ class SchemaRetriever extends AbstractDb
     }
     
     /**
-     * Sort columns by table in a sub array
+     * Sort the columns by table in a sub array
      * 
      * @param array $schema
      * @return array
