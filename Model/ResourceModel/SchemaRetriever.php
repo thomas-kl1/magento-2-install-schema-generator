@@ -1,22 +1,17 @@
 <?php
 /**
- * Blackbird Install Schema Generator Module
+ * Blackbird InstallSchemaGenerator Module
  *
  * NOTICE OF LICENSE
- *
- * This source file is subject to the Open Software License (OSL 3.0)
- * that is bundled with this package in the file LICENSE.txt.
- * It is also available through the world-wide-web at this URL:
- * http://opensource.org/licenses/osl-3.0.php
  * If you did not receive a copy of the license and are unable to
  * obtain it through the world-wide-web, please send an email
  * to contact@bird.eu so we can send you a copy immediately.
  *
- * @category            Blackbird
- * @package		Blackbird_InstallSchemaGenerator
- * @copyright           Copyright (c) 2015 Blackbird (http://black.bird.eu)
- * @author		Blackbird Team
- * @license		http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @category        Blackbird
+ * @package         Blackbird_InstallSchemaGenerator
+ * @copyright       Copyright (c) 2017 Blackbird (http://black.bird.eu)
+ * @author          Blackbird Team
+ * @license         https://www.store.bird.eu/license/
  */
 namespace Blackbird\InstallSchemaGenerator\Model\ResourceModel;
 
@@ -39,32 +34,17 @@ class SchemaRetriever extends AbstractDb
         $dbConfig = $this->getConnection()->getConfig();
         $this->dbname = $dbConfig['dbname'];
     }
-    
-    /**
-     * Get all database tables
-     * 
-     * @return Array
-     */
-    public function getTables() {
-        $sql = "SELECT TABLE_NAME FROM information_schema.TABLES
-                WHERE TABLE_SCHEMA = '" . $this->dbname . "'";
-        
-        // Prepare query
-        $fetch = $this->getConnection()->fetchAll($sql);
-        return $fetch;
-    }
-    
+
     /**
      * Retrieve all tables
      * 
      * @return array
      */
-    public function getTablesOptions() {
-        $tables = $this->getTables();
-        $options = array();
+    public function getTablesOptions()
+    {
+        $options = [];
         
-        foreach ($tables as $table) {
-            $table = $table['TABLE_NAME'];
+        foreach ($this->getConnection()->getTables() as $table) {
             $options[] = [
                 'value' => $table,
                 'label' => __($table)
@@ -80,8 +60,8 @@ class SchemaRetriever extends AbstractDb
      * @param array $tables
      * @return array
      */
-    public function getSchema($tables = array())
-    {        
+    public function getSchema($tables = [])
+    {
         // Select all informations about columns, indexes and foreign keys
         $sql = "SELECT T.TABLE_NAME, T.TABLE_COMMENT,
                        C.COLUMN_NAME, C.COLUMN_COMMENT, C.COLUMN_DEFAULT, C.COLUMN_TYPE, COLUMN_KEY,
@@ -119,15 +99,11 @@ class SchemaRetriever extends AbstractDb
                     AND KCU.TABLE_NAME = RC.TABLE_NAME
                     AND KCU.REFERENCED_TABLE_NAME = RC.REFERENCED_TABLE_NAME
                 
-                WHERE C.TABLE_SCHEMA = '" . $this->dbname . "'";        
+                WHERE C.TABLE_SCHEMA = '" . $this->dbname . "'";
         
         // If no specific table is given, we return all database tables
         if (is_array($tables) && !empty($tables)) {
-            $sql .= " AND C.TABLE_NAME IN (";
-            foreach($tables as $table) {
-                $sql .= "'" . $table . "', ";
-            }
-            $sql = substr($sql, 0, -2) . ")";
+            $sql .= $this->getConnection()->quoteInto(' AND C.TABLE_NAME IN (?)', $tables);
         }
         
         $sql .= " ORDER BY C.TABLE_NAME, C.ORDINAL_POSITION";
@@ -149,20 +125,20 @@ class SchemaRetriever extends AbstractDb
     private function sanitizeSchema($schema)
     {
         if (!is_array($schema)) {
-            return array();
+            return [];
         }
         
-        $finalSchema = array();
+        $finalSchema = [];
         
         foreach ($schema as $column) {
             $tabname = $column['TABLE_NAME'];
             $colname = $column['COLUMN_NAME'];
             
             if (!isset($finalSchema[$tabname])) {
-                $finalSchema[$tabname] = array();
+                $finalSchema[$tabname] = [];
             }
             if (!isset($finalSchema[$tabname][$colname]['CONSTRAINTS'])) {
-                $finalSchema[$tabname][$colname]['CONSTRAINTS'] = array();
+                $finalSchema[$tabname][$colname]['CONSTRAINTS'] = [];
             }
             
             $finalSchema[$tabname][$colname]['CONSTRAINTS'][] = [
@@ -191,5 +167,4 @@ class SchemaRetriever extends AbstractDb
         
         return $finalSchema;
     }
-    
 }

@@ -1,22 +1,17 @@
 <?php
 /**
- * Blackbird Install Schema Generator Module
+ * Blackbird InstallSchemaGenerator Module
  *
  * NOTICE OF LICENSE
- *
- * This source file is subject to the Open Software License (OSL 3.0)
- * that is bundled with this package in the file LICENSE.txt.
- * It is also available through the world-wide-web at this URL:
- * http://opensource.org/licenses/osl-3.0.php
  * If you did not receive a copy of the license and are unable to
  * obtain it through the world-wide-web, please send an email
  * to contact@bird.eu so we can send you a copy immediately.
  *
- * @category            Blackbird
- * @package		Blackbird_InstallSchemaGenerator
- * @copyright           Copyright (c) 2015 Blackbird (http://black.bird.eu)
- * @author		Blackbird Team
- * @license		http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @category        Blackbird
+ * @package         Blackbird_InstallSchemaGenerator
+ * @copyright       Copyright (c) 2017 Blackbird (http://black.bird.eu)
+ * @author          Blackbird Team
+ * @license         https://www.store.bird.eu/license/
  */
 namespace Blackbird\InstallSchemaGenerator\Model;
 
@@ -40,11 +35,11 @@ class SchemaSetupBuilder
     public function getSetupBySchema(array $schema, $namespace = '')
     {
         if (!$this->isNamespace($namespace)) {
-            $namespace = "Vendor\Area";
+            $namespace = 'Vendor\Area';
         }
         $installSchema = $this->getHeader($namespace);
         
-        foreach ($schema as $name=>$table) {
+        foreach ($schema as $name => $table) {
             $installSchema .= $this->getNewTable($name, $table);
         }
         
@@ -163,7 +158,7 @@ class SchemaSetupBuilder
     {
         $unsigned = stripos($type, 'unsigned') === false ? '' : 'true';
         
-        $matches = array();
+        $matches = [];
         preg_match('#(.*)[(](.+)[)].*#', $type, $matches);
         
         $match = (!empty($matches[1])) ? strtolower($matches[1]) : $type;
@@ -257,7 +252,7 @@ class SchemaSetupBuilder
     private function getAddIndexes($columns)
     {
         $return = '';
-        $indexes = array();
+        $indexes = [];
         
         // Sort columns which are part of the same index
         foreach ($columns as $column) {
@@ -272,7 +267,7 @@ class SchemaSetupBuilder
                 if (!empty($idxname) && empty($constraint['REFERENCED_TABLE_NAME']) && empty($constraint['REFERENCED_COLUMN_NAME']) && $isIndex) {
                     
                     if (!isset($indexes[$idxname])) {
-                        $indexes[$idxname] = array();
+                        $indexes[$idxname] = [];
                     }
                     
                     // Is fulltext, else is simple index (== none by default)
