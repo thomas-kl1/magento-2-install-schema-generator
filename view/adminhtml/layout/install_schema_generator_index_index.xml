@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Blackbird InstallSchemaGenerator Module
+ *
+ * NOTICE OF LICENSE
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to contact@bird.eu so we can send you a copy immediately.
+ *
+ * @category        Blackbird
+ * @package         Blackbird_InstallSchemaGenerator
+ * @copyright       Copyright (c) 2017 Blackbird (http://black.bird.eu)
+ * @author          Blackbird Team
+ * @license         https://www.store.bird.eu/license/
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="admin-2columns-left" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceContainer name="content">
+            <block class="Blackbird\InstallSchemaGenerator\Block\Adminhtml\Retriever\Edit" name="installschemagenerator_retriever_edit"/>
+        </referenceContainer>
+        <referenceContainer name="left">
+            <block class="Blackbird\InstallSchemaGenerator\Block\Adminhtml\Retriever\Edit\Tabs" name="installschemagenerator_retriever_edit_tabs">
+                <block class="Blackbird\InstallSchemaGenerator\Block\Adminhtml\Retriever\Edit\Tab\Infos" name="installschemagenerator_retriever_edit_tab_infos"/>
+                <block class="Blackbird\InstallSchemaGenerator\Block\Adminhtml\Retriever\Edit\Tab\Tables" name="installschemagenerator_retriever_edit_tab_tables"/>
+                <action method="addTab">
+                    <argument name="name" xsi:type="string">infos_section</argument>
+                    <argument name="block" xsi:type="string">installschemagenerator_retriever_edit_tab_infos</argument>
+                </action>
+                <action method="addTab">
+                    <argument name="name" xsi:type="string">tables_section</argument>
+                    <argument name="block" xsi:type="string">installschemagenerator_retriever_edit_tab_tables</argument>
+                </action>
+            </block>
+        </referenceContainer>
+    </body>
+</page>
