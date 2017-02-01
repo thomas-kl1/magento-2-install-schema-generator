@@ -99,7 +99,7 @@ class SchemaRetriever extends AbstractDb
                     AND KCU.TABLE_NAME = RC.TABLE_NAME
                     AND KCU.REFERENCED_TABLE_NAME = RC.REFERENCED_TABLE_NAME
                 
-                WHERE C.TABLE_SCHEMA = " . $this->getConnection()->quoteIdentifier($this->dbname);
+                WHERE C.TABLE_SCHEMA = '" . $this->dbname . "'";
         
         // If no specific table is given, we return all database tables
         if (is_array($tables) && !empty($tables)) {
