@@ -75,7 +75,7 @@ class Retriever extends Action
             $tables = $this->getRequest()->getParam('tables');
         
             if (!is_array($tables)) {
-                $this->messageManager->addError(__('Please select at least one table.'));
+                $this->messageManager->addErrorMessage(__('Please select at least one table.'));
             } else {
                 $retriever = $this->_objectManager->create('Blackbird\InstallSchemaGenerator\Model\ResourceModel\SchemaRetriever');
                 $builder = $this->_objectManager->create('Blackbird\InstallSchemaGenerator\Model\SchemaSetupBuilder');
@@ -84,7 +84,7 @@ class Retriever extends Action
                     $schema = $retriever->getSchema($tables);
                     $result = $builder->getSetupBySchema($schema, $namespace);
                     $this->download('InstallSchema.php', $result);
-                    $this->messageManager->addSuccessMessage(__('Your InstallSchema.php is downloading !'));
+                    $this->messageManager->addSuccessMessage(__('Your InstallSchema.php is downloading!'));
                 } catch (LocalizedException $e) {
                     $this->messageManager->addErrorMessage($e->getMessage());
                 } catch (\Exception $e) {
