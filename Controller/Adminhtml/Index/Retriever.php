@@ -1,26 +1,22 @@
 <?php
 /**
- * Blackbird Install Schema Generator Module
+ * Blackbird InstallSchemaGenerator Module
  *
  * NOTICE OF LICENSE
- *
- * This source file is subject to the Open Software License (OSL 3.0)
- * that is bundled with this package in the file LICENSE.txt.
- * It is also available through the world-wide-web at this URL:
- * http://opensource.org/licenses/osl-3.0.php
  * If you did not receive a copy of the license and are unable to
  * obtain it through the world-wide-web, please send an email
  * to contact@bird.eu so we can send you a copy immediately.
  *
- * @category            Blackbird
- * @package		Blackbird_InstallSchemaGenerator
- * @copyright           Copyright (c) 2015 Blackbird (http://black.bird.eu)
- * @author		Blackbird Team
- * @license		http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @category        Blackbird
+ * @package         Blackbird_InstallSchemaGenerator
+ * @copyright       Copyright (c) 2017 Blackbird (https://black.bird.eu)
+ * @author          Blackbird Team
+ * @license         https://www.store.bird.eu/license/
  */
 namespace Blackbird\InstallSchemaGenerator\Controller\Adminhtml\Index;
 
 use Magento\Framework\App\Filesystem\DirectoryList;
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Backend\App\Action;
 
 class Retriever extends Action
@@ -38,9 +34,7 @@ class Retriever extends Action
         \Magento\Backend\App\Action\Context $context,
         \Magento\Framework\App\Response\Http\FileFactory $fileFactory
     ) {
-        parent::__construct(
-            $context
-        );
+        parent::__construct($context);
         $this->fileFactory = $fileFactory;
     }
     
@@ -81,7 +75,7 @@ class Retriever extends Action
             $tables = $this->getRequest()->getParam('tables');
         
             if (!is_array($tables)) {
-                $this->messageManager->addError(__('Please select at least one table.'));
+                $this->messageManager->addErrorMessage(__('Please select at least one table.'));
             } else {
                 $retriever = $this->_objectManager->create('Blackbird\InstallSchemaGenerator\Model\ResourceModel\SchemaRetriever');
                 $builder = $this->_objectManager->create('Blackbird\InstallSchemaGenerator\Model\SchemaSetupBuilder');
@@ -89,12 +83,13 @@ class Retriever extends Action
                 try {
                     $schema = $retriever->getSchema($tables);
                     $result = $builder->getSetupBySchema($schema, $namespace);
+                    $this->download('InstallSchema.php', $result);
+                    $this->messageManager->addSuccessMessage(__('Your InstallSchema.php is downloading!'));
+                } catch (LocalizedException $e) {
+                    $this->messageManager->addErrorMessage($e->getMessage());
                 } catch (\Exception $e) {
-                    $this->messageManager->addError($e->getMessage());
+                    $this->messageManager->addExceptionMessage($e, $e->getMessage());
                 }
-
-                $this->download('InstallSchema.php', $result);
-                $this->messageManager->addSuccess(__('Your InstallSchema.php is downloading !'));   
             }
         }
         

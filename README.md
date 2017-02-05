@@ -1,6 +1,6 @@
 # Install Schema Generator
 
-**A Magento 2 extension**
+**An extension for Magento 2**
 
 ## Synopsis
 
@@ -41,12 +41,12 @@ You can access to the extension by the following access menu : "SYSTEM" => "Inst
 
 Select the table(s) and click on "Generate and download file" button to generate the InstallSchema.php file.
 
-![alt tag](http://black.bird.eu/media/wysiwyg/images/screen_backend_isg.jpg)
+![alt tag](https://black.bird.eu/media/wysiwyg/images/screen_backend_isg.jpg)
 
 ## Contributors
 
-Thomas Klein ([Blackbird](http://black.bird.eu) team member)
+Thomas Klein ([Blackbird](https://black.bird.eu) team member)
 
 ## License
 
-OSL 3.0
+Blackbird Policy (https://store.bird.eu/license)
