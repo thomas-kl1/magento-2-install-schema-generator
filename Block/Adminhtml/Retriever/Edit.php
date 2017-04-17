@@ -23,9 +23,7 @@ use Magento\Backend\Block\Widget\Form\Container;
 class Edit extends Container
 {
     /**
-     * Initialize form
-     * 
-     * @return void
+     * {@inheritdoc}
      */
     protected function _construct()
     {

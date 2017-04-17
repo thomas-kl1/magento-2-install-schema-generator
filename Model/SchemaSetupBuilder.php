@@ -15,39 +15,70 @@
  */
 namespace Blackbird\InstallSchemaGenerator\Model;
 
+use Magento\Framework\App\Response\Http\FileFactory;
+use Magento\Framework\View\Element\BlockFactory;
+use Blackbird\InstallSchemaGenerator\Api\SchemaSetupBuilderInterface;
+use Blackbird\InstallSchemaGenerator\Model\DB\SchemaRetriever;
+use Blackbird\InstallSchemaGenerator\Block\InstallSchema;
+
 /**
- * Schema builder for setup schema installation
- *
- * @todo use bloack template for rendering the php class code generation
+ * Class SchemaSetupBuilder
  */
-class SchemaSetupBuilder
+class SchemaSetupBuilder implements SchemaSetupBuilderInterface
 {
     /**
-     * @var array
+     * @var SchemaRetriever
      */
-    private $bool = ['YES' => 'true', 'NO' => 'false'];
+    private $schemaRetriever;
     
     /**
-     * Setup the InstallSchema php class for the given database schema
-     * 
-     * @param array $schema
-     * @param string $namespace
-     * @return string
+     * @var FileFactory
      */
-    public function getSetupBySchema(array $schema, $namespace = '')
-    {
-        if (!$this->isNamespace($namespace)) {
-            $namespace = 'Vendor\Area';
-        }
-        $installSchema = $this->getHeader($namespace);
+    private $fileFactory;
+    
+    /**
+     * @var BlockFactory 
+     */
+    private $blockFactory;
+    
+    /**
+     * @param SchemaRetriever $schemaRetriever
+     * @param FileFactory $fileFactory
+     * @param BlockFactory $blockFactory
+     */
+    public function __construct(
+        SchemaRetriever $schemaRetriever,
+        FileFactory $fileFactory,
+        BlockFactory $blockFactory
+    ) {
+        $this->schemaRetriever = $schemaRetriever;
+        $this->fileFactory = $fileFactory;
+        $this->blockFactory = $blockFactory;
+    }
+    
+    /**
+     * {@inheritdoc}
+     */
+    public function generate(
+        array $tables = [],
+        $namespace = null,
+        $location = null
+    ) {
+        // Generate the render
+        $block = $this->blockFactory->createBlock(InstallSchema::class)
+            ->setNamespace($this->isNamespace($namespace) ? $namespace : 'Vendor\Area')
+            ->setTables($this->schemaRetriever->getSchema($tables));
         
-        foreach ($schema as $name => $table) {
-            $installSchema .= $this->getNewTable($name, $table);
-        }
+        $filename = '';//todo
         
-        $installSchema .= $this->getFooter();
+        // Create the InstallSchema.php class file
+        $this->fileFactory->create(
+            $filename,
+            $block->toHtml(),
+            DirectoryList::TMP//todo
+        );
         
-        return $installSchema;
+        return $filename;
     }
     
     /**
@@ -58,192 +89,18 @@ class SchemaSetupBuilder
      */
     private function isNamespace($namespace)
     {
-        $return = (!empty($namespace));
-        
-        if ($return) {
-            $return = (count(explode("\\", $namespace)) === 2);
-        }
-        
-        return $return;
+        return (!empty($namespace) && count(explode("\\", $namespace)) === 2);
     }
+
     
-    /**
-     * Return options 
-     *
-     * @param array $options
-     * @return string
-     */
-    private function getOptions($options)
-    {
-        $ln = '';
-        $nullable = $this->bool[$options['null']];
-        
-        $return = "\t\t\t\t[";
-        
-        if (!empty($options['default']) || $options['default'] === '0') {
-            $return .= PHP_EOL . "\t\t\t\t\t'default' => '" . $options['default'] ."',";
-            $ln = PHP_EOL . "\t\t\t\t";
-        }
-        if ($nullable === 'false') {
-            $return .=  PHP_EOL . "\t\t\t\t\t'nullable' => false,";
-            $ln = PHP_EOL . "\t\t\t\t";
-        }
-        if (!empty($options['scale'])) {
-            $return .=  PHP_EOL . "\t\t\t\t\t'scale' => '" . $options['scale'] . "',";
-            $ln = PHP_EOL . "\t\t\t\t";
-        }
-        if (!empty($options['precision'])) {
-            $return .=  PHP_EOL . "\t\t\t\t\t'precision' => '" . $options['precision'] . "',";
-            $ln = PHP_EOL . "\t\t\t\t";
-        }
-        if ($options['unsigned']) {
-            $return .= PHP_EOL . "\t\t\t\t\t'unsigned' => true,";
-            $ln = PHP_EOL . "\t\t\t\t";
-        }
-        if (!empty($options['extra'])) {
-            $return .= PHP_EOL . "\t\t\t\t\t'" . $options['extra'] . "' => true,";
-            $ln = PHP_EOL . "\t\t\t\t";
-        }
-        if (!empty($options['key'])) {
-            $return .=  PHP_EOL . "\t\t\t\t\t'" . $options['key'] . "' => true,";
-            $ln = PHP_EOL . "\t\t\t\t";
-        }
-        
-        $return .= $ln . "]";
-        
-        return $return;
-    }
+
     
-    /**
-     * Return the extra
-     *
-     * @param string $extra
-     * @return string
-     */
-    private function getExtra($extra)
-    {        
-        // auto_increment, on update CURRENT_TIMESTAMP, (todo: virtual generated)
-        if ($extra !== 'auto_increment') {
-            if ($extra !== 'on update CURRENT_TIMESTAMP') {
-                $extra = null;
-            }
-        }
-        
-        return $extra;
-    }
     
-    /**
-     * Return the corresponding key
-     *
-     * @param string $key
-     * @return string
-     */
-    private function getKey($key)
-    {
-        $key = null;
-        
-        // PRI, UNI, MUL
-        if ($key === 'PRI') {
-            $key = 'primary';
-        }
-        
-        return $key;
-    }
     
-    /**
-     * Return the type and the size of the field
-     *
-     * @param string $type
-     * @return array
-     */
-    private function getTypeAndSize($type)
-    {
-        $unsigned = stripos($type, 'unsigned') === false ? '' : 'true';
-        
-        $matches = [];
-        preg_match('#(.*)[(](.+)[)].*#', $type, $matches);
-        
-        $match = (!empty($matches[1])) ? strtolower($matches[1]) : $type;
-        $size = (!empty($matches[2])) ? $matches[2] : 'null';
-        
-        // formalize type for magento 2
-        $type = $this->getRealType($match);
-        $type = $type['type'];
-        $size = (isset($type['size'])) ? $type['size'] : $size;
-                
-        return ['type' => $type, 'size' => $size, 'unsigned' => $unsigned];
-    }
     
-    /**
-     * Returns the type and size by mysql type
-     * 
-     * @return array
-     */
-    private function getRealType($type)
-    {
-        $result = ['type' => strtoupper($type)];
-        
-        $types = [
-            'char' => [
-                'type' => 'TEXT',
-            ],
-            'varchar' => [
-                'type' => 'TEXT',
-            ],
-            'text' => [
-                'type' => 'TEXT',
-                'size' => '16000',
-            ],
-            'tinytext' => [
-                'type' => 'TEXT',
-                'size' => '255',
-            ],
-            'mediumtext' => [
-                'type' => 'TEXT',
-                'size' => '16000000',
-            ],
-            'longtext' => [
-                'type' => 'TEXT',
-                'size' => '16000000000',
-            ],
-            'int' => [
-                'type' => 'INTEGER',
-            ],
-            'tinyint' => [
-                'type' => 'SMALLINT',
-            ],                
-            'mediumint' => [
-                'type' => 'INTEGER',
-            ],
-            'double' => [
-                'type' => 'FLOAT',
-            ],
-            'real' => [
-                'type' => 'FLOAT',
-            ],
-            'time' => [
-                'type' => 'TIMESTAMP',
-            ],
-            'tinyblob' => [
-                'type' => 'BLOB',
-            ],
-            'mediumblob' => [
-                'type' => 'BLOB',
-            ],
-            'longblob' => [
-                'type' => 'BLOB',
-            ],
-            'binary' => [
-                'type' => 'VARBINARY',
-            ]
-        ];
-            
-        if (isset($types[$type])) {
-            $result = $types[$type];
-        }
-        
-        return $result;
-    }
+    
+    
+    
     
     /**
      * Create the Add Index part
@@ -320,179 +177,5 @@ class SchemaSetupBuilder
         }
         
         return $return;
-    }
-    
-    /**
-     * Create the Add Foreign Key part
-     *
-     * @param array $column
-     * @return string
-     */
-    private function getAddForeignKey($column)
-    {
-        $return = '';
-        
-        foreach ($column['CONSTRAINTS'] as $constraint) {
-            $isFk = !empty($constraint['DELETE_RULE']);
-            $fkName = $constraint['CONSTRAINT_NAME'];
-            $fkTablename = $column['TABLE_NAME'];
-            $fkColumnname = $column['COLUMN_NAME'];
-            $rfTablename = $constraint['REFERENCED_TABLE_NAME'];
-            $rfColumnname = $constraint['REFERENCED_COLUMN_NAME'];
-            
-            if (!empty($fkName) && !empty($rfTablename) && !empty($rfColumnname) && $isFk) {
-                // Set the action for the delete rule
-                $action = 'ACTION_' . str_replace(" ", "_", strtoupper($constraint['DELETE_RULE']));
-                
-                $return .= "\t\t\t->addForeignKey(" . PHP_EOL;
-                $return .= "\t\t\t\t\$installer->getFkName(" . PHP_EOL;
-                $return .= "\t\t\t\t\t'" . $fkTablename . "'," . PHP_EOL;
-                $return .= "\t\t\t\t\t'" . $fkColumnname . "'," . PHP_EOL;
-                $return .= "\t\t\t\t\t'" . $rfTablename . "'," . PHP_EOL;
-                $return .= "\t\t\t\t\t'" . $rfColumnname . "'" . PHP_EOL;
-                $return .= "\t\t\t\t)," . PHP_EOL;
-                $return .= "\t\t\t\t'" . $fkColumnname . "'," . PHP_EOL;
-                $return .= "\t\t\t\t\$installer->getTable('" . $rfTablename . "')," . PHP_EOL;
-                $return .= "\t\t\t\t'" . $rfColumnname . "'," . PHP_EOL;
-                $return .= "\t\t\t\t\\Magento\\Framework\\DB\Ddl\Table::" . $action . PHP_EOL;
-                $return .= "\t\t\t)" . PHP_EOL;
-            }
-        }
-        
-        return $return;
-    }
-    
-    /**
-     * Create the Add Column part
-     *
-     * @param array $column
-     * @return string
-     */
-    private function getAddColumn($column)
-    {
-        $typesize = $this->getTypeAndSize($column['COLUMN_TYPE']);
-        
-        // Type
-        $type = $typesize['type'];
-        
-        // Size
-        $size = $typesize['size'];
-        $size = is_int(strpos($size, ',')) ? '[' . $size . ']' : $size;
-        
-        // Precision
-        $precision = null;
-        if (!is_null($column['NUMERIC_PRECISION'])) {
-            $precision = $column['NUMERIC_PRECISION'];
-        } elseif (!is_null($column['DATETIME_PRECISION'])) {
-            $precision = $column['DATETIME_PRECISION'];
-        }
-        
-        // Comment
-        $comment = !empty($column['COLUMN_COMMENT']) ? "'" . $column['COLUMN_COMMENT'] . "'" : "null";
-     
-        // Add the options
-        $options = [
-            'unsigned' => $typesize['unsigned'],
-            'default' => $column['COLUMN_DEFAULT'],
-            'null' => $column['IS_NULLABLE'],
-            'key' => $this->getKey($column['COLUMN_KEY']),
-            'scale' => $column['NUMERIC_SCALE'],
-            'precision' => $precision,
-            'extra' => $this->getExtra($column['EXTRA'])
-        ];
-        $options = $this->getOptions($options);
-        
-        // Add a new column with their properties
-        $return = "\t\t\t->addColumn(" . PHP_EOL;                    
-        $return .= "\t\t\t\t'" . $column['COLUMN_NAME'] . "'," . PHP_EOL;
-        $return .= "\t\t\t\t\Magento\Framework\DB\Ddl\Table::TYPE_" . $type . "," . PHP_EOL;
-        $return .= "\t\t\t\t" . $size . "," . PHP_EOL;
-        $return .= $options . "," . PHP_EOL;
-        $return .= "\t\t\t\t" . $comment . PHP_EOL;
-        $return .= "\t\t\t)" . PHP_EOL;
-        
-        return $return;
-    }
-    
-    /**
-     * Create the New Table part
-     *
-     * @param string $name
-     * @param array $table
-     * @return string
-     */
-    private function getNewTable($name, $table)
-    {
-        $return = "\t\t" . PHP_EOL;
-        $return .= "\t\t/**" . PHP_EOL;
-        $return .= "\t\t * Create table '" . $name . "'" . PHP_EOL;
-        $return .= "\t\t */" . PHP_EOL;
-        $return .= "\t\t\$table = \$installer->getConnection()" . PHP_EOL;
-        $return .= "\t\t\t->newTable(\$installer->getTable('" . $name . "'))" . PHP_EOL;
-        
-        // Add the Columns
-        foreach ($table as $column) {
-            $return .= $this->getAddColumn($column);
-            $comment = !empty($column['TABLE_COMMENT']) ? $column['TABLE_COMMENT'] : $column['TABLE_NAME'];
-        }
-        
-        // Add the Indexes
-        $return .= $this->getAddIndexes($table);
-        
-        // Add the Foreign Keys
-        foreach ($table as $column) {
-            $return .= $this->getAddForeignKey($column);
-        }
-        
-        $return .= "\t\t\t->setComment('" . $comment . "');" . PHP_EOL;
-        $return .= "\t\t\$installer->getConnection()->createTable(\$table);" . PHP_EOL;
-        $return .= "\t\t" . PHP_EOL;
-        
-        return $return;
-    }
-    
-    /**
-     * Create the header of the InstallSchema script
-     *
-     * @param string $namespace
-     * @return string
-     */
-    private function getHeader($namespace)
-    {
-        $return = "<?php" . PHP_EOL;
-        $return .= "namespace " . $namespace . "\Setup;" . PHP_EOL;
-        $return .= PHP_EOL;
-        $return .= "use Magento\Framework\Setup\InstallSchemaInterface;" . PHP_EOL;
-        $return .= "use Magento\Framework\Setup\ModuleContextInterface;" . PHP_EOL;
-        $return .= "use Magento\Framework\Setup\SchemaSetupInterface;" . PHP_EOL;
-        $return .= PHP_EOL;
-        $return .= "class InstallSchema implements InstallSchemaInterface" . PHP_EOL;
-        $return .= "{" . PHP_EOL;
-        $return .= "\tpublic function install(SchemaSetupInterface \$setup, ModuleContextInterface \$context)" . PHP_EOL;
-        $return .= "\t{" . PHP_EOL;
-        $return .= "\t" . PHP_EOL;
-        $return .= "\t\t\$installer = \$setup;" . PHP_EOL;
-        $return .= "\t\t" . PHP_EOL;
-        $return .= "\t\t\$installer->startSetup();" . PHP_EOL;
-        $return .= "\t\t" . PHP_EOL;
-        
-        return $return;
-    }
-    
-    /**
-     * Create the footer of the InstallSchema script
-     *
-     * @return string
-     */
-    private function getFooter()
-    {
-        $return = "\t\t" . PHP_EOL;
-        $return .= "\t\t\$installer->endSetup();" . PHP_EOL;
-        $return .= "\t\t" . PHP_EOL;
-        $return .= "\t}" . PHP_EOL;
-        $return .= "}" . PHP_EOL;
-        
-        return $return;
-    }
-    
+    }      
 }

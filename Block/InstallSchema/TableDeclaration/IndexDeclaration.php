@@ -13,18 +13,17 @@
  * @author          Blackbird Team
  * @license         https://www.store.bird.eu/license/
  */
-namespace Blackbird\InstallSchemaGenerator\Block\Adminhtml\Retriever\Edit;
+namespace Blackbird\InstallSchemaGenerator\Block\InstallSchema\TableDeclaration;
 
-class Tabs extends \Magento\Backend\Block\Widget\Tabs
-{    
+use Magento\Framework\View\Element\Template;
+
+/**
+ * Layout block of the index declaration
+ */
+class IndexDeclaration extends Template
+{
     /**
-     * {@inheritdoc}
+     * @var string
      */
-    protected function _construct()
-    {
-        parent::_construct();
-        $this->setId('installschemagenerator_retriever_tabs');
-        $this->setDestElementId('edit_form');
-        $this->setTitle(__('Settings'));
-    }
+    protected $_template = 'Blackbird_InstallSchemaGenerator::InstallSchema/TableDeclaration/index-declaration.phtml';
 }
