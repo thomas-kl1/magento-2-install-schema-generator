@@ -17,6 +17,8 @@ namespace Blackbird\InstallSchemaGenerator\Model;
 
 /**
  * Schema builder for setup schema installation
+ *
+ * @todo use bloack template for rendering the php class code generation
  */
 class SchemaSetupBuilder
 {
