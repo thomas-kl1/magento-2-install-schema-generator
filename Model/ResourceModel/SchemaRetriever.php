@@ -47,7 +47,7 @@ class SchemaRetriever extends AbstractDb
         foreach ($this->getConnection()->getTables() as $table) {
             $options[] = [
                 'value' => $table,
-                'label' => __($table)
+                'label' => $table,
             ];
         }
         
@@ -57,6 +57,7 @@ class SchemaRetriever extends AbstractDb
     /**
      * Return the tables schema
      * 
+     * @todo improve query
      * @param array $tables
      * @return array
      */
