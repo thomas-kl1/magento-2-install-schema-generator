@@ -79,7 +79,7 @@ class InstallSchemaGeneratorCommand extends Command
                     self::GENERATE_LOCATION,
                     '-l',
                     InputOption::VALUE_REQUIRED,
-                    'Set specific location to generate the InstallSchema.php file.'
+                    'Set the relative file location from the temp dir of your Magento, to generate the InstallSchema.php file.'
                 ),
             ]);
 
@@ -91,12 +91,16 @@ class InstallSchemaGeneratorCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $filename = $this->installSchemaBuilder->generate(
-            array_map('trim', $input->getArgument(self::INPUT_DATABASE_TABLES)),
-            $input->getOption(self::INPUT_NAMESPACE),
-            $input->getOption(self::GENERATE_LOCATION)
-        );
-        
-        $output->writeln('<info>The InstallSchema.php class file has been writed in: ' . $filename . '!</info>');        
+        try {
+            $filename = $this->installSchemaBuilder->generate(
+                array_map('trim', $input->getArgument(self::INPUT_DATABASE_TABLES)),
+                $input->getOption(self::INPUT_NAMESPACE),
+                $input->getOption(self::GENERATE_LOCATION)
+            );
+            
+            $output->writeln('<info>The InstallSchema class file has been writed in: ' . $filename . '</info>');        
+        } catch (\Exception $e) {
+            $output->writeln($e->getMessage());        
+        }
     }
 }

@@ -25,13 +25,13 @@ interface SchemaSetupBuilderInterface
      * 
      * @param array $tables
      * @param string $namespace
-     * @param string $location
+     * @param string $filename
      * @return string
      * @api
      */
     public function generate(
         array $tables = [],
         $namespace = null,
-        $location = null
+        $filename = null
     );
 }

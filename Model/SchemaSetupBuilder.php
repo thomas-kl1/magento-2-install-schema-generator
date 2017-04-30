@@ -15,8 +15,9 @@
  */
 namespace Blackbird\InstallSchemaGenerator\Model;
 
-use Magento\Framework\Filesystem;
 use Magento\Framework\App\Filesystem\DirectoryList;
+use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Filesystem;
 use Magento\Framework\View\Element\BlockFactory;
 use Blackbird\InstallSchemaGenerator\Api\SchemaSetupBuilderInterface;
 use Blackbird\InstallSchemaGenerator\Model\DB\SchemaRetriever;
@@ -31,6 +32,11 @@ class SchemaSetupBuilder implements SchemaSetupBuilderInterface
      * Default namespace name
      */
     const DEFAULT_NAMESPACE = 'Vendor/Area';
+    
+    /**
+     * Default filename for the setup file
+     */
+    const DEFAULT_FILENAME = 'install-schema-generator/InstallSchema.php';
     
     /**
      * @var SchemaRetriever
@@ -68,14 +74,12 @@ class SchemaSetupBuilder implements SchemaSetupBuilderInterface
     public function generate(
         array $tables = [],
         $namespace = self::DEFAULT_NAMESPACE,
-        $location = 'install-schema-generator'
+        $filename = self::DEFAULT_FILENAME
     ) {
         // Generate the renderer template block
         $block = $this->blockFactory->createBlock(InstallSchema::class)
             ->setNamespace($this->sanitizeNamespace($namespace))
             ->setTables($this->schemaRetriever->getSchema($tables));
-        
-        $filename = rtrim($location, '/') . '/InstallSchema.php';
         
         // Create the InstallSchema.php class file
         $writer = $this->filesystem->getDirectoryWrite(DirectoryList::TMP);
@@ -87,10 +91,14 @@ class SchemaSetupBuilder implements SchemaSetupBuilderInterface
             
             try {
                 $file->write($block->getHtml());
+            } catch (\Exception $e) {
+                throw new LocalizedException(__('An error has occured during the generation of the %1 setup file.', $filename));
             } finally {
                 $file->unlock();
             }
-	} finally {
+        } catch (\Exception $e) {
+            throw new LocalizedException(__('An error has occured during the generation of the %1 setup file.', $filename));
+        } finally {
             $file->close();
 	}
         
