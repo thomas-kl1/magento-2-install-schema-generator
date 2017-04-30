@@ -26,13 +26,13 @@
         $table = $installer->getConnection()
             ->newTable($installer->getTable('<?php echo $block->getTableName(); ?>')
         <?php foreach ($this->getColumns() as $column): ?>
-        <?php echo $block->getColumnDeclarationHtml($column); ?>
+            <?php echo $block->getColumnDeclarationHtml($column); ?>
         <?php endforeach; ?>
-            //todo
-        <?php echo $block->getIndexDeclarationHtml($column); ?>
-            //----
+        <?php echo $block->getIndexDeclarationHtml($this->getColumns()); ?>
         <?php foreach ($this->getColumns() as $column): ?>
-        <?php echo $block->getForeignKeyDeclarationHtml($column); ?>
+            <?php foreach ($column['CONSTRAINTS'] as $constraint): ?>
+                <?php echo $block->getForeignKeyDeclarationHtml($column['COLUMN_NAME'], $constraint); ?>
+            <?php endforeach; ?>
         <?php endforeach; ?>
             ->setComment('<?php echo $block->getComment(); ?>');
         $installer->getConnection()->createTable($table);

@@ -20,3 +20,14 @@
  * @see \Blackbird\InstallSchemaGenerator\Block\InstallSchema\TableDeclaration\IndexDeclaration
  */
 ?>
+            <?php foreach ($block->getIndexes() as $indexName => $index): ?>
+            ->addIndex(
+                $installer->getIdxName(
+                    <?php echo $block->getTableName(); ?>,
+                    <?php echo $block->getIndexColumnsArrayFormat($index['type'], $index['column']); ?>
+                    <?php echo $index['type'] ?: ''; ?>
+                ),
+                <?php echo $block->getIndexColumnsArrayFormat($index['type'], $index['column']); ?>
+                <?php echo $block->getIndexTypeArrayFormat($index['type']); ?>
+            )
+            <?php endforeach; ?>

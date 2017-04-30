@@ -70,7 +70,11 @@ class Retriever extends Action
             $this->messageManager->addErrorMessage(__('Please select at least one table.'));
         } else {
             try {
-                $filename = $this->installSchemaBuilder->generate($tables, $namespace);
+                $filename = $this->installSchemaBuilder->generate(
+                        $tables,
+                        $namespace,
+                        DirectoryList::TMP
+                    );
 
                 $this->fileFactory->create(
                     $filename,

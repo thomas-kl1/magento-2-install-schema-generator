@@ -27,6 +27,7 @@ interface SchemaSetupBuilderInterface
      * @param string $namespace
      * @param string $location
      * @return string
+     * @api
      */
     public function generate(
         array $tables = [],

@@ -25,7 +25,7 @@ class ForeignKey extends Template
     /**
      * @var string
      */
-    protected $_template = 'Blackbird_InstallSchemaGenerator::InstallSchema/TableDeclaration/foreign-key-declaration.phtml';
+    protected $_template = 'Blackbird_InstallSchemaGenerator::install-schema/table-declaration/foreign-key-declaration.phtml';
         
     /**
      * Check if it's a foreign key or not
@@ -105,6 +105,6 @@ class ForeignKey extends Template
     {
         $constraint = $this->getConstraintData();
         
-        return $constraint['REFERENCED_COLUMN_NAME'];;
+        return $constraint['REFERENCED_COLUMN_NAME'];
     }
 }

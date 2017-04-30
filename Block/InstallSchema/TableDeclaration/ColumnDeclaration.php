@@ -25,7 +25,7 @@ class ColumnDeclaration extends Template
     /**
      * @var string
      */
-    protected $_template = 'Blackbird_InstallSchemaGenerator::InstallSchema/TableDeclaration/column-declaration.phtml';
+    protected $_template = 'Blackbird_InstallSchemaGenerator::install-schema/table-declaration/column-declaration.phtml';
     
     /**
      * Retrieve the column name

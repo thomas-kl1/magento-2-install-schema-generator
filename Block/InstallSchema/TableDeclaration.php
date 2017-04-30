@@ -28,7 +28,7 @@ class TableDeclaration extends Template
     /**
      * @var string
      */
-    protected $_template = 'Blackbird_InstallSchemaGenerator::InstallSchema/table-declaration.phtml';
+    protected $_template = 'Blackbird_InstallSchemaGenerator::install-schema/table-declaration.phtml';
     
     /**
      * Retrieve the column definition
@@ -47,30 +47,32 @@ class TableDeclaration extends Template
     /**
      * Retrieve the index definition
      * 
-     * @param array $column
+     * @param array $columns
      * @return string
      */
-    public function getIndexDeclarationHtml(array $column)
+    public function getIndexDeclarationHtml(array $columns)
     {
         return $this->getLayout()
             ->createBlock(IndexDeclaration::class)
-                //todo
+            ->setTableName($this->getTableName())
+            ->setColumns($columns)
             ->toHtml();
     }
     
     /**
      * Retrieve the foreign key definition
      * 
-     * @param array $column
+     * @param string $columnName
+     * @param array $constraint
      * @return string
      */
-    public function getForeignKeyDeclarationHtml(array $column)
+    public function getForeignKeyDeclarationHtml($columnName, array $constraint)
     {
         return $this->getLayout()
             ->createBlock(ForeignKeyDeclaration::class)
-            ->setTableName($column['TABLE_NAME'])
-            ->setColumnName($column['COLUMN_NAME'])
-            ->setConstraintData($column['CONSTRAINTS'])
+            ->setTableName($this->getTableName())
+            ->setColumnName($columnName)
+            ->setConstraintData($constraint)
             ->toHtml();
     }
     
