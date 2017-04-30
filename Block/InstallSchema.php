@@ -29,6 +29,16 @@ class InstallSchema extends Template
     protected $_template = 'Blackbird_InstallSchemaGenerator::install-schema.phtml';
     
     /**
+     * Retrieve the template block html
+     * 
+     * @return string
+     */
+    public function getHtml()
+    {
+        return $this->toHtml();
+    }
+
+        /**
      * Retrieve the table definition
      * 
      * @param array $tableName

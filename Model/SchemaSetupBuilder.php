@@ -15,8 +15,8 @@
  */
 namespace Blackbird\InstallSchemaGenerator\Model;
 
+use Magento\Framework\Filesystem;
 use Magento\Framework\App\Filesystem\DirectoryList;
-use Magento\Framework\App\Response\Http\FileFactory;
 use Magento\Framework\View\Element\BlockFactory;
 use Blackbird\InstallSchemaGenerator\Api\SchemaSetupBuilderInterface;
 use Blackbird\InstallSchemaGenerator\Model\DB\SchemaRetriever;
@@ -38,9 +38,9 @@ class SchemaSetupBuilder implements SchemaSetupBuilderInterface
     private $schemaRetriever;
     
     /**
-     * @var FileFactory
+     * @var Filesystem
      */
-    private $fileFactory;
+    private $filesystem;
     
     /**
      * @var BlockFactory 
@@ -49,16 +49,16 @@ class SchemaSetupBuilder implements SchemaSetupBuilderInterface
     
     /**
      * @param SchemaRetriever $schemaRetriever
-     * @param FileFactory $fileFactory
+     * @param Filesystem $filesystem
      * @param BlockFactory $blockFactory
      */
     public function __construct(
         SchemaRetriever $schemaRetriever,
-        FileFactory $fileFactory,
+        Filesystem $filesystem,
         BlockFactory $blockFactory
     ) {
         $this->schemaRetriever = $schemaRetriever;
-        $this->fileFactory = $fileFactory;
+        $this->filesystem = $filesystem;
         $this->blockFactory = $blockFactory;
     }
     
@@ -68,21 +68,31 @@ class SchemaSetupBuilder implements SchemaSetupBuilderInterface
     public function generate(
         array $tables = [],
         $namespace = self::DEFAULT_NAMESPACE,
-        $location = DirectoryList::TMP
+        $location = 'install-schema-generator'
     ) {
         // Generate the renderer template block
         $block = $this->blockFactory->createBlock(InstallSchema::class)
             ->setNamespace($this->sanitizeNamespace($namespace))
             ->setTables($this->schemaRetriever->getSchema($tables));
         
-        $filename = '';//todo
+        $filename = rtrim($location, '/') . '/InstallSchema.php';
         
         // Create the InstallSchema.php class file
-        $this->fileFactory->create(
-            $filename,
-            $block->toHtml(),
-            DirectoryList::TMP//todo
-        );
+        $writer = $this->filesystem->getDirectoryWrite(DirectoryList::TMP);
+        
+        $file = $writer->openFile($filename, 'w');
+        
+	try {
+            $file->lock();
+            
+            try {
+                $file->write($block->getHtml());
+            } finally {
+                $file->unlock();
+            }
+	} finally {
+            $file->close();
+	}
         
         return $filename;
     }
