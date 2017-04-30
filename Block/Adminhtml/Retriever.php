@@ -20,9 +20,7 @@ use Magento\Backend\Block\Widget\Grid\Container;
 class Retriever extends Container
 {
     /**
-     * Constructor
-     *
-     * @return void
+     * {@inheritdoc}
      */
     protected function _construct()
     {

@@ -15,18 +15,43 @@
  */
 namespace Blackbird\InstallSchemaGenerator\Controller\Adminhtml\Index;
 
+use Magento\Framework\View\Result\PageFactory;
 use Magento\Backend\App\Action;
+use Magento\Backend\App\Action\Context;
 
 class Index extends Action
-{    
+{
     /**
-     * @return void
+     * @var PageFactory
+     */
+    private $resultPageFactory;
+    
+    /**
+     * @param Context $context
+     * @param PageFactory $resultPageFactory
+     */
+    public function __construct(
+        Context $context,
+        PageFactory $resultPageFactory
+    ) {
+        $this->resultPageFactory = $resultPageFactory;
+        parent::__construct($context);
+    }
+    
+    /**
+     * {@inheritdoc}
      */
     public function execute()
     {
-        $this->_view->loadLayout();
-        $this->_setActiveMenu('Blackbird_InstallSchemaGenerator::main_menu')->_addBreadcrumb(__('Install Schema Generator'), __('Install Schema Generator'));
-        $this->_view->getPage()->getConfig()->getTitle()->prepend(__('Install Schema Generator'));
-        $this->_view->renderLayout();
+        $this->_setActiveMenu('Blackbird_InstallSchemaGenerator::main_menu')
+            ->_addBreadcrumb(
+                __('Install Schema Generator'),
+                __('Install Schema Generator')
+            );
+        
+        $resultPage = $this->resultPageFactory->create();
+        $resultPage->getConfig()->getTitle()->prepend(__('Install Schema Generator'));
+        
+        return $resultPage;            
     }
 }

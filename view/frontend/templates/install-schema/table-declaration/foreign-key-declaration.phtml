@@ -1,0 +1,37 @@
+<?php
+/**
+ * Blackbird InstallSchemaGenerator Module
+ *
+ * NOTICE OF LICENSE
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to contact@bird.eu so we can send you a copy immediately.
+ *
+ * @category        Blackbird
+ * @package         Blackbird_InstallSchemaGenerator
+ * @copyright       Copyright (c) 2017 Blackbird (https://black.bird.eu)
+ * @author          Blackbird Team
+ * @license         https://www.store.bird.eu/license/
+ */
+?>
+<?php
+/**
+ * @var \Blackbird\InstallSchemaGenerator\Block\InstallSchema\TableDeclaration\ForeignKeyDeclaration $block
+ * @see \Blackbird\InstallSchemaGenerator\Block\InstallSchema\TableDeclaration\ForeignKeyDeclaration
+ */
+?>
+            <?php if ($block->isForeignKey()): ?>
+            ->addForeignKey(
+                $installer->getFkName(
+                    <?php echo $block->getFkTableName(); ?>,
+                    <?php echo $block->getFkColumnName(); ?>,
+                    <?php echo $block->getRefFkTableName(); ?>,
+                    <?php echo $block->getRefFkColumnName(); ?>,
+                ),
+                <?php echo $block->getFkColumnName(); ?>,
+                $installer->getTable('<?php echo $block->getRefFkTableName(); ?>'),
+                <?php echo $block->getRefFkColumnName(); ?>,
+                Table::ACTION_<?php echo $block->getDeleteRule(); ?>                
+            )
+            <?php endif; ?>
+            

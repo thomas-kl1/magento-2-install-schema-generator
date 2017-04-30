@@ -16,83 +16,75 @@
 namespace Blackbird\InstallSchemaGenerator\Controller\Adminhtml\Index;
 
 use Magento\Framework\App\Filesystem\DirectoryList;
+use Magento\Framework\App\Response\Http\FileFactory;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Backend\App\Action;
+use Magento\Backend\App\Action\Context;
+use Blackbird\InstallSchemaGenerator\Api\SchemaSetupBuilderInterface;
 
 class Retriever extends Action
 {
     /**
-     * @var \Magento\Framework\App\Response\Http\FileFactory
+     * @var FileFactory
      */
-    protected $fileFactory;
-
+    private $fileFactory;
+    
     /**
-     * @param \Magento\Backend\App\Action\Context $context
-     * @param \Magento\Framework\App\Response\Http\FileFactory $fileFactory
+     * @var SchemaSetupBuilderInterface
+     */
+    private $installSchemaBuilder;
+    
+    /**
+     * @param Context $context
+     * @param FileFactory $fileFactory
+     * @param SchemaSetupBuilderInterface $installSchemaBuilder
      */
     public function __construct(
-        \Magento\Backend\App\Action\Context $context,
-        \Magento\Framework\App\Response\Http\FileFactory $fileFactory
+        Context $context,
+        FileFactory $fileFactory,
+        SchemaSetupBuilderInterface $installSchemaBuilder
     ) {
         parent::__construct($context);
         $this->fileFactory = $fileFactory;
+        $this->installSchemaBuilder = $installSchemaBuilder;
     }
     
     /**
-     * Download the file
-     * 
-     * @param string $fileName
-     * @param string $content
-     */
-    protected function download($fileName, $content)
-    {
-        $this->fileFactory->create(
-            $fileName,
-            $content,
-            DirectoryList::TMP,
-            'application/octet-stream'
-        );
-    }
-    
-    /**
-     * Download action of the Install Schema script
-     *
-     * @return void
-     * @throws \Exception
+     * {@inheritdoc}
      */
     public function execute()
     {
-        $resultRedirect = $this->resultRedirectFactory->create();
-        $isPost = $this->getRequest()->getPost();
+        if (!$this->getRequest()->isPost()) {
+            return $this->resultRedirectFactory->create()->setPath('*/*/');
+        }
         
-        if($isPost) {
-            $vendor = trim($this->getRequest()->getParam('vendor'));
-            $vendor = !empty($vendor) ? $vendor : 'Vendor';
-            $module = trim($this->getRequest()->getParam('module'));
-            $module = !empty($module) ? $module : 'Module';
-            
-            $namespace = $vendor . '\\' . $module;
-            $tables = $this->getRequest()->getParam('tables');
-        
-            if (!is_array($tables)) {
-                $this->messageManager->addErrorMessage(__('Please select at least one table.'));
-            } else {
-                $retriever = $this->_objectManager->create('Blackbird\InstallSchemaGenerator\Model\ResourceModel\SchemaRetriever');
-                $builder = $this->_objectManager->create('Blackbird\InstallSchemaGenerator\Model\SchemaSetupBuilder');
+        // todo refactor
+        $vendor = trim($this->getRequest()->getParam('vendor'));
+        $vendor = !empty($vendor) ? $vendor : 'Vendor';
+        $module = trim($this->getRequest()->getParam('module'));
+        $module = !empty($module) ? $module : 'Module';
+        $namespace = $vendor . '\\' . $module;
+        $tables = $this->getRequest()->getParam('tables');
 
-                try {
-                    $schema = $retriever->getSchema($tables);
-                    $result = $builder->getSetupBySchema($schema, $namespace);
-                    $this->download('InstallSchema.php', $result);
-                    $this->messageManager->addSuccessMessage(__('Your InstallSchema.php is downloading!'));
-                } catch (LocalizedException $e) {
-                    $this->messageManager->addErrorMessage($e->getMessage());
-                } catch (\Exception $e) {
-                    $this->messageManager->addExceptionMessage($e, $e->getMessage());
-                }
+        if (!is_array($tables)) {
+            $this->messageManager->addErrorMessage(__('Please select at least one table.'));
+        } else {
+            try {
+                $filename = $this->installSchemaBuilder->generate($tables, $namespace);
+
+                $this->fileFactory->create(
+                    $filename,
+                    ['type' => 'filename', 'value' => $filename],
+                    DirectoryList::TMP,
+                    'application/octet-stream'
+                );
+            } catch (LocalizedException $e) {
+                $this->messageManager->addErrorMessage($e->getMessage());
+            } catch (\Exception $e) {
+                $this->messageManager->addExceptionMessage($e, $e->getMessage());
             }
         }
         
-        return $resultRedirect->setPath('*/*/');
+        return $this->resultRedirectFactory->create()->setPath('*/*/');
     }
 }

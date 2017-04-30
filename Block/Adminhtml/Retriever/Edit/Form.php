@@ -20,9 +20,7 @@ use Magento\Backend\Block\Widget\Form\Generic;
 class Form extends Generic
 {
     /**
-     * Prepare form before rendering HTML
-     *
-     * @return $this
+     * {@inheritdoc}
      */
     protected function _prepareForm()
     {

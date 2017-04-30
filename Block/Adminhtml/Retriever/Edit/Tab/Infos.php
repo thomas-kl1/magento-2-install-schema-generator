@@ -56,9 +56,7 @@ class Infos extends Generic implements TabInterface
     }
     
     /**
-     * Prepare form before rendering HTML
-     *
-     * @return $this
+     * {@inheritdoc}
      */
     public function _prepareForm()
     {

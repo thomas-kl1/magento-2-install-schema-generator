@@ -1,0 +1,52 @@
+<?php
+/**
+ * Blackbird InstallSchemaGenerator Module
+ *
+ * NOTICE OF LICENSE
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to contact@bird.eu so we can send you a copy immediately.
+ *
+ * @category        Blackbird
+ * @package         Blackbird_InstallSchemaGenerator
+ * @copyright       Copyright (c) 2017 Blackbird (https://black.bird.eu)
+ * @author          Blackbird Team
+ * @license         https://www.store.bird.eu/license/
+ */
+?>
+<?php
+/**
+ * @var \Blackbird\InstallSchemaGenerator\Block\InstallSchema $block
+ * @see \Blackbird\InstallSchemaGenerator\Block\InstallSchema
+ */
+?>
+<?php echo '<?php'; ?>
+/**
+ * LICENCE HEADER
+ */
+namespace <?php echo $block->getNamespace() ?>;
+
+use Magento\Framework\DB\Adapter\AdapterInterface;
+use Magento\Framework\DB\Ddl\Table;
+use Magento\Framework\Setup\InstallSchemaInterface;
+use Magento\Framework\Setup\ModuleContextInterface;
+use Magento\Framework\Setup\SchemaSetupInterface;
+
+class InstallSchema implements InstallSchemaInterface
+{
+    /**
+     * {@inheritdoc}
+     */
+    public function install(SchemaSetupInterface $setup, ModuleContextInterface $context)
+    {
+        $installer = $setup;
+        
+        $installer->startSetup();
+        
+        <?php foreach ($block->getTables() as $tableName => $columns): ?>
+            <?php echo $block->getTableDeclarationHtml($tableName, $columns); ?>
+        <?php endforeach; ?>
+        
+        $installer->endSetup();
+    }
+}

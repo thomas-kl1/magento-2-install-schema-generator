@@ -13,18 +13,25 @@
  * @author          Blackbird Team
  * @license         https://www.store.bird.eu/license/
  */
-namespace Blackbird\InstallSchemaGenerator\Block\Adminhtml\Retriever\Edit;
+namespace Blackbird\InstallSchemaGenerator\Api;
 
-class Tabs extends \Magento\Backend\Block\Widget\Tabs
-{    
+/**
+ * @api
+ */
+interface SchemaSetupBuilderInterface
+{
     /**
-     * {@inheritdoc}
+     * Generate the SetupSchema.php class file
+     * 
+     * @param array $tables
+     * @param string $namespace
+     * @param string $filename
+     * @return string
+     * @api
      */
-    protected function _construct()
-    {
-        parent::_construct();
-        $this->setId('installschemagenerator_retriever_tabs');
-        $this->setDestElementId('edit_form');
-        $this->setTitle(__('Settings'));
-    }
+    public function generate(
+        array $tables = [],
+        $namespace = null,
+        $filename = null
+    );
 }

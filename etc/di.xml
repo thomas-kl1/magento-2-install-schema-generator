@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Blackbird InstallSchemaGenerator Module
+ *
+ * NOTICE OF LICENSE
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to contact@bird.eu so we can send you a copy immediately.
+ *
+ * @category        Blackbird
+ * @package         Blackbird_InstallSchemaGenerator
+ * @copyright       Copyright (c) 2017 Blackbird (https://black.bird.eu)
+ * @author          Blackbird Team
+ * @license         https://www.store.bird.eu/license/
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <preference for="Blackbird\InstallSchemaGenerator\Api\SchemaSetupBuilderInterface"
+                type="Blackbird\InstallSchemaGenerator\Model\SchemaSetupBuilderInterface"/>
+    <type name="Magento\Framework\Console\CommandList">
+        <arguments>
+            <argument name="commands" xsi:type="array">
+                <item name="greeting_command" xsi:type="object">Blackbird\InstallSchemaGenerator\Console\Command\InstallSchemaGeneratorCommand</item>
+            </argument>
+        </arguments>
+    </type>
+</config>

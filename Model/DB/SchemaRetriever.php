@@ -13,31 +13,40 @@
  * @author          Blackbird Team
  * @license         https://www.store.bird.eu/license/
  */
-namespace Blackbird\InstallSchemaGenerator\Model\ResourceModel;
+namespace Blackbird\InstallSchemaGenerator\Model\DB;
 
-use Magento\Framework\Model\ResourceModel\Db\AbstractDb;
+use Magento\Framework\DB\Adapter\AdapterInterface;
+use Magento\Framework\App\ResourceConnection;
 
-class SchemaRetriever extends AbstractDb
-{       
+/**
+ * Class SchemaRetriever
+ */
+class SchemaRetriever
+{
     /**
-     * The default database name
-     * 
-     * @var string
+     * @var ResourceConnection 
      */
-    protected $dbname;
+    private $resource;
     
     /**
-     * @return void
+     * @var string
      */
-    public function _construct()
+    private $dbname;
+    
+    /**
+     * @param ResourceConnection $resourceConnection
+     */
+    public function __construct(ResourceConnection $resourceConnection)
     {
+        $this->connection = $resourceConnection;
         $dbConfig = $this->getConnection()->getConfig();
         $this->dbname = $dbConfig['dbname'];
-    }
+    }    
 
     /**
      * Retrieve all tables
      * 
+     * @todo remove/refactor
      * @return array
      */
     public function getTablesOptions()
@@ -57,18 +66,31 @@ class SchemaRetriever extends AbstractDb
     /**
      * Return the tables schema
      * 
-     * @todo improve query
      * @param array $tables
      * @return array
      */
-    public function getSchema($tables = [])
+    public function getSchema(array $tables = [])
+    {
+        return $this->sanitizeSchema($this->querySchema($tables));
+    }
+    
+    /**
+     * Prepare and query the schema
+     * 
+     * @param array $tables
+     * @return array
+     */
+    private function querySchema(array $tables)
     {
         // Select all informations about columns, indexes and foreign keys
         $sql = "SELECT T.TABLE_NAME, T.TABLE_COMMENT,
-                       C.COLUMN_NAME, C.COLUMN_COMMENT, C.COLUMN_DEFAULT, C.COLUMN_TYPE, COLUMN_KEY,
-                       C.IS_NULLABLE, C.NUMERIC_PRECISION, C.NUMERIC_SCALE, C.DATETIME_PRECISION, C.EXTRA,
-                       S.INDEX_NAME, S.INDEX_TYPE, TC.CONSTRAINT_NAME, TC.CONSTRAINT_TYPE,
-                       KCU.REFERENCED_TABLE_NAME, KCU.REFERENCED_COLUMN_NAME, RC.DELETE_RULE
+                       C.COLUMN_NAME, C.COLUMN_COMMENT, C.COLUMN_DEFAULT, 
+                       C.COLUMN_TYPE, COLUMN_KEY, C.IS_NULLABLE, 
+                       C.NUMERIC_PRECISION, C.NUMERIC_SCALE, 
+                       C.DATETIME_PRECISION, C.EXTRA, S.INDEX_NAME, 
+                       S.INDEX_TYPE, TC.CONSTRAINT_NAME, TC.CONSTRAINT_TYPE,
+                       KCU.REFERENCED_TABLE_NAME, KCU.REFERENCED_COLUMN_NAME, 
+                       RC.DELETE_RULE
                        
                 FROM information_schema.TABLES T
                 LEFT OUTER JOIN information_schema.COLUMNS AS C
@@ -103,18 +125,15 @@ class SchemaRetriever extends AbstractDb
                 WHERE C.TABLE_SCHEMA = '" . $this->dbname . "'";
         
         // If no specific table is given, we return all database tables
-        if (is_array($tables) && !empty($tables)) {
-            $sql .= $this->getConnection()->quoteInto(' AND C.TABLE_NAME IN (?)', $tables);
+        if (!empty($tables)) {
+            $sql .= $this->getConnection()
+                         ->quoteInto(' AND C.TABLE_NAME IN (?)', $tables);
         }
         
         $sql .= " ORDER BY C.TABLE_NAME, C.ORDINAL_POSITION";
        
         // Prepare the query
-        $schema = $this->getConnection()->fetchAll($sql);
-        
-        $schema = $this->sanitizeSchema($schema);
-        
-        return $schema;
+        return $this->getConnection()->fetchAll($sql);
     }
     
     /**
@@ -123,12 +142,8 @@ class SchemaRetriever extends AbstractDb
      * @param array $schema
      * @return array
      */
-    private function sanitizeSchema($schema)
-    {
-        if (!is_array($schema)) {
-            return [];
-        }
-        
+    private function sanitizeSchema(array $schema)
+    {        
         $finalSchema = [];
         
         foreach ($schema as $column) {
@@ -167,5 +182,15 @@ class SchemaRetriever extends AbstractDb
         }
         
         return $finalSchema;
+    }
+    
+    /**
+     * Retrieve the DB adapter connection
+     * 
+     * @return AdapterInterface
+     */
+    private function getConnection()
+    {
+        return $this->resource->getConnection(ResourceConnection::DEFAULT_CONNECTION);
     }
 }

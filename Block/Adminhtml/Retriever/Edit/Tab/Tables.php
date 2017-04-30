@@ -15,8 +15,12 @@
  */
 namespace Blackbird\InstallSchemaGenerator\Block\Adminhtml\Retriever\Edit\Tab;
 
+use Magento\Framework\Data\FormFactory;
+use Magento\Framework\Registry;
 use Magento\Backend\Block\Widget\Form\Generic;
 use Magento\Backend\Block\Widget\Tab\TabInterface;
+use Magento\Backend\Block\Template\Context;
+use Blackbird\InstallSchemaGenerator\Model\DB\SchemaRetriever;
 
 /**
  * Retrieve InstallSchema class from tables form block
@@ -24,26 +28,26 @@ use Magento\Backend\Block\Widget\Tab\TabInterface;
 class Tables extends Generic implements TabInterface
 {
     /**
-     * @var \Magento\Framework\ObjectManagerInterface 
+     * @var SchemaRetriever
      */
-    protected $_objectManager;
+    private $schemaSource;
     
     /**
-     * @param \Magento\Backend\Block\Template\Context $context
-     * @param \Magento\Framework\Registry $registry
-     * @param \Magento\Framework\Data\FormFactory $formFactory
-     * @param \Magento\Framework\ObjectManagerInterface $objectManager
+     * @param Context $context
+     * @param Registry $registry
+     * @param FormFactory $formFactory
+     * @param SchemaRetriever $schemaRetriever
      * @param array $data
      */
     public function __construct(
-        \Magento\Backend\Block\Template\Context $context,
-        \Magento\Framework\Registry $registry,
-        \Magento\Framework\Data\FormFactory $formFactory,
-        \Magento\Framework\ObjectManagerInterface $objectManager,
+        Context $context,
+        Registry $registry,
+        FormFactory $formFactory,
+        SchemaRetriever $schemaRetriever,
         array $data = []
     ) {
+        $this->schemaSource = $schemaRetriever;
         parent::__construct($context, $registry, $formFactory, $data);
-        $this->_objectManager = $objectManager;
     }
     
     /**
@@ -79,14 +83,10 @@ class Tables extends Generic implements TabInterface
     }
     
     /**
-     * Prepare form before rendering HTML
-     *
-     * @return $this
+     * {@inheritdoc}
      */
     public function _prepareForm()
     {
-        $retriever = $this->_objectManager->create('\Blackbird\InstallSchemaGenerator\Model\ResourceModel\SchemaRetriever');
-        
         /** @var \Magento\Framework\Data\Form $form */
         $form = $this->_formFactory->create();
         $form->setHtmlIdPrefix('isg_');
@@ -105,7 +105,7 @@ class Tables extends Generic implements TabInterface
                 'title' => __('Tables'),
                 'note' => __('Select the table(s) to generate the InstallSchema.php file.'),
                 'required' => true,
-                'values' => $retriever->getTablesOptions()
+                'values' => $this->schemaSource->getTablesOptions()
             ]
         );
         
