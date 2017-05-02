@@ -1,0 +1,39 @@
+<?php
+/**
+ * Blackbird InstallSchemaGenerator Module
+ *
+ * NOTICE OF LICENSE
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to contact@bird.eu so we can send you a copy immediately.
+ *
+ * @category        Blackbird
+ * @package         Blackbird_InstallSchemaGenerator
+ * @copyright       Copyright (c) 2017 Blackbird (https://black.bird.eu)
+ * @author          Blackbird Team
+ * @license         https://www.store.bird.eu/license/
+ */
+?>
+<?php
+/**
+ * @var \Blackbird\InstallSchemaGenerator\Block\InstallSchema\TableDeclaration $block
+ * @see \Blackbird\InstallSchemaGenerator\Block\InstallSchema\TableDeclaration
+ */
+?>
+        /**
+         * Create table '<?php echo $block->getTableName(); ?>'
+         */
+        $table = $installer->getConnection()
+            ->newTable($installer->getTable('<?php echo $block->getTableName(); ?>'))
+<?php foreach ($this->getColumns() as $column): ?>
+<?php echo $block->getColumnDeclarationHtml($column); ?>
+<?php endforeach; ?>
+<?php echo $block->getIndexDeclarationHtml($this->getColumns()); ?>
+<?php foreach ($this->getColumns() as $column): ?>
+<?php foreach ($column['CONSTRAINTS'] as $constraint): ?>
+<?php echo $block->getForeignKeyDeclarationHtml($column['COLUMN_NAME'], $constraint); ?>
+<?php endforeach; ?>
+<?php endforeach; ?>
+            ->setComment('<?php echo $block->getComment(); ?>');
+        $installer->getConnection()->createTable($table);
+        

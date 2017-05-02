@@ -15,7 +15,9 @@
  */
 namespace Blackbird\InstallSchemaGenerator\Block\Adminhtml\Retriever\Edit;
 
-class Tabs extends \Magento\Backend\Block\Widget\Tabs
+use Magento\Backend\Block\Widget\Tabs as WidgetTabs;
+
+class Tabs extends WidgetTabs
 {    
     /**
      * {@inheritdoc}

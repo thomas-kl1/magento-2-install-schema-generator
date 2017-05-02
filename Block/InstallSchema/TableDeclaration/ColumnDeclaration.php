@@ -47,9 +47,9 @@ class ColumnDeclaration extends Template
      */
     public function getColumnType()
     {
-        $typesize = $this->getTypeAndSize();
+        $typeSize = $this->getTypeAndSize();
         
-        return $typesize['type'];
+        return $typeSize['type'];
     }
     
     /**
@@ -60,9 +60,22 @@ class ColumnDeclaration extends Template
      */
     public function getColumnSize()
     {
-        $typesize = $this->getTypeAndSize();
+        $typeSize = $this->getTypeAndSize();
         
-        return $typesize['size'];
+        return $typeSize['size'];
+    }
+
+    /**
+     * Retrieve the column unsigned
+     *
+     * @todo refactor
+     * @return string
+     */
+    public function getColumnUnsigned()
+    {
+        $typeSize = $this->getTypeAndSize();
+
+        return $typeSize['unsigned'];
     }
     
     /**
@@ -94,19 +107,6 @@ class ColumnDeclaration extends Template
         }
         
         return $precision;
-    }
-    
-    /**
-     * Retrieve the column unsigned
-     * 
-     * @todo refactor
-     * @return string
-     */
-    public function getColumnUnsigned()
-    {
-        $typesize = $this->getTypeAndSize();
-        
-        return $typesize['unsigned'];
     }
     
     /**
@@ -154,7 +154,6 @@ class ColumnDeclaration extends Template
     /**
      * Return the type and the size of the field
      *
-     * @param string $type
      * @return array
      */
     private function getTypeAndSize()
@@ -169,7 +168,7 @@ class ColumnDeclaration extends Template
         $match = (!empty($matches[1])) ? strtolower($matches[1]) : $type;
         $size = (!empty($matches[2])) ? $matches[2] : 'null';
         
-        // formalize type for magento 2
+        // Formalize the type for magento 2
         $type = $this->getRealType($match);
         $type = $type['type'];
         $size = (isset($type['size'])) ? $type['size'] : $size;
@@ -179,7 +178,8 @@ class ColumnDeclaration extends Template
     
     /**
      * Returns the type and size by mysql type
-     * 
+     *
+     * @param string $type
      * @return array
      */
     private function getRealType($type)

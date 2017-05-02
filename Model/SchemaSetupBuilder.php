@@ -37,7 +37,7 @@ class SchemaSetupBuilder implements SchemaSetupBuilderInterface
      * Default filename for the setup file
      */
     const DEFAULT_FILENAME = 'install-schema-generator/InstallSchema.php';
-    
+
     /**
      * @var SchemaRetriever
      */
@@ -52,7 +52,7 @@ class SchemaSetupBuilder implements SchemaSetupBuilderInterface
      * @var BlockFactory 
      */
     private $blockFactory;
-    
+
     /**
      * @param SchemaRetriever $schemaRetriever
      * @param Filesystem $filesystem
@@ -83,23 +83,21 @@ class SchemaSetupBuilder implements SchemaSetupBuilderInterface
 
         // Create the InstallSchema.php class file
         $writer = $this->filesystem->getDirectoryWrite(DirectoryList::TMP);
-        
+
         $file = $writer->openFile($filename, 'w');
-        
+
 	    try {
             $file->lock();
             
             try {
                 $file->write($block->getHtml());
             } catch (\Exception $e) {
-                throw $e;
-                //throw new LocalizedException(__('An error has occured during the generation of the %1 setup file.', $filename));
+                throw new LocalizedException(__('An error has occurred during the generation of the %1 setup file.', $filename));
             } finally {
                 $file->unlock();
             }
         } catch (\Exception $e) {
-            throw $e;
-            //throw new LocalizedException(__('An error has occured during the generation of the %1 setup file.', $filename));
+            throw new LocalizedException(__('An error has occurred during the generation of the %1 setup file.', $filename));
         } finally {
             $file->close();
 	}

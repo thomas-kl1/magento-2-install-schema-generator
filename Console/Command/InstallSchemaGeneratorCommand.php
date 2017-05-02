@@ -29,7 +29,7 @@ use Blackbird\InstallSchemaGenerator\Api\SchemaSetupBuilderInterface;
 class InstallSchemaGeneratorCommand extends Command
 {
     /**
-     * Databse tables argument
+     * Database tables argument
      */
     const INPUT_DATABASE_TABLES = 'tables';
 
@@ -81,12 +81,12 @@ class InstallSchemaGeneratorCommand extends Command
                     InputArgument::OPTIONAL | InputArgument::IS_ARRAY,
                     'Space-separated list of database tables or omit to apply to all database tables.'
                 ),
-                /*new InputOption(
+                new InputOption(
                     self::INPUT_NAMESPACE,
-                    '-n',
+                    '-p',
                     InputOption::VALUE_REQUIRED,
                     'Set specific namespace to the InstallSchema class.'
-                ),*/
+                ),
                 new InputOption(
                     self::GENERATE_LOCATION,
                     '-l',
@@ -107,9 +107,9 @@ class InstallSchemaGeneratorCommand extends Command
 
         try {
             $filename = $this->installSchemaBuilder->generate(
-                array_map('trim', $input->getArgument(self::INPUT_DATABASE_TABLES))/*,
+                array_map('trim', $input->getArgument(self::INPUT_DATABASE_TABLES)),
                 $input->getOption(self::INPUT_NAMESPACE),
-                $input->getOption(self::GENERATE_LOCATION)*/
+                $input->getOption(self::GENERATE_LOCATION)
             );
             
             $output->writeln('<info>The InstallSchema class file has been written in: ' . $filename . '</info>');

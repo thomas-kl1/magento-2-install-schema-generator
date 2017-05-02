@@ -53,9 +53,4 @@ class InstallSchema extends Template
             ->setColumns($columns)
             ->toHtml();
     }
-
-    public function toHtml()
-    {
-        return parent::toHtml();
-    }
 }

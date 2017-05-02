@@ -44,9 +44,9 @@ class Retriever extends Action
         FileFactory $fileFactory,
         SchemaSetupBuilderInterface $installSchemaBuilder
     ) {
-        parent::__construct($context);
         $this->fileFactory = $fileFactory;
         $this->installSchemaBuilder = $installSchemaBuilder;
+        parent::__construct($context);
     }
     
     /**
@@ -57,23 +57,17 @@ class Retriever extends Action
         if (!$this->getRequest()->isPost()) {
             return $this->resultRedirectFactory->create()->setPath('*/*/');
         }
-        
-        // todo refactor
-        $vendor = trim($this->getRequest()->getParam('vendor'));
-        $vendor = !empty($vendor) ? $vendor : 'Vendor';
-        $module = trim($this->getRequest()->getParam('module'));
-        $module = !empty($module) ? $module : 'Module';
-        $namespace = $vendor . '\\' . $module;
+
         $tables = $this->getRequest()->getParam('tables');
 
         if (!is_array($tables)) {
             $this->messageManager->addErrorMessage(__('Please select at least one table.'));
         } else {
             try {
-                $filename = $this->installSchemaBuilder->generate($tables, $namespace);
+                $filename = $this->installSchemaBuilder->generate($tables, $this->getCustomNamespace());
 
                 $this->fileFactory->create(
-                    $filename,
+                    'InstallSchema.php',
                     ['type' => 'filename', 'value' => $filename],
                     DirectoryList::TMP,
                     'application/octet-stream'
@@ -86,5 +80,20 @@ class Retriever extends Action
         }
         
         return $this->resultRedirectFactory->create()->setPath('*/*/');
+    }
+
+    /**
+     * Retrieve the namespace param
+     *
+     * @return string
+     */
+    private function getCustomNamespace()
+    {
+        $vendor = trim($this->getRequest()->getParam('vendor'));
+        $vendor = !empty($vendor) ? $vendor : 'Vendor';
+        $module = trim($this->getRequest()->getParam('module'));
+        $module = !empty($module) ? $module : 'Area';
+
+        return $vendor . '\\' . $module;
     }
 }
