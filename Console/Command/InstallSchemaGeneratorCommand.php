@@ -20,6 +20,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Magento\Framework\App\State as AppState;
 use Blackbird\InstallSchemaGenerator\Api\SchemaSetupBuilderInterface;
 
 /**
@@ -43,17 +44,28 @@ class InstallSchemaGeneratorCommand extends Command
     const GENERATE_LOCATION = 'location';
 
     /**
+     * @var AppState
+     */
+    private $appState;
+
+    /**
      * @var SchemaSetupBuilderInterface
      */
     private $installSchemaBuilder;
-    
+
     /**
+     * @param AppState $appState
      * @param SchemaSetupBuilderInterface $installSchemaBuilder
+     * @param null $name
      */
     public function __construct(
-        SchemaSetupBuilderInterface $installSchemaBuilder
+        AppState $appState,
+        SchemaSetupBuilderInterface $installSchemaBuilder,
+        $name = null
     ) {
+        $this->appState = $appState;
         $this->installSchemaBuilder = $installSchemaBuilder;
+        parent::__construct($name);
     }
 
     /**
@@ -69,12 +81,12 @@ class InstallSchemaGeneratorCommand extends Command
                     InputArgument::OPTIONAL | InputArgument::IS_ARRAY,
                     'Space-separated list of database tables or omit to apply to all database tables.'
                 ),
-                new InputOption(
+                /*new InputOption(
                     self::INPUT_NAMESPACE,
                     '-n',
                     InputOption::VALUE_REQUIRED,
                     'Set specific namespace to the InstallSchema class.'
-                ),
+                ),*/
                 new InputOption(
                     self::GENERATE_LOCATION,
                     '-l',
@@ -91,14 +103,16 @@ class InstallSchemaGeneratorCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $this->appState->setAreaCode(\Magento\Framework\App\Area::AREA_GLOBAL);
+
         try {
             $filename = $this->installSchemaBuilder->generate(
-                array_map('trim', $input->getArgument(self::INPUT_DATABASE_TABLES)),
+                array_map('trim', $input->getArgument(self::INPUT_DATABASE_TABLES))/*,
                 $input->getOption(self::INPUT_NAMESPACE),
-                $input->getOption(self::GENERATE_LOCATION)
+                $input->getOption(self::GENERATE_LOCATION)*/
             );
             
-            $output->writeln('<info>The InstallSchema class file has been writed in: ' . $filename . '</info>');        
+            $output->writeln('<info>The InstallSchema class file has been written in: ' . $filename . '</info>');
         } catch (\Exception $e) {
             $output->writeln($e->getMessage());        
         }

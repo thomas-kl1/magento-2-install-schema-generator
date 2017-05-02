@@ -43,7 +43,7 @@ class Index extends Action
      */
     public function execute()
     {
-        $this->_setActiveMenu('Blackbird_InstallSchemaGenerator::main_menu')
+        $this->_setActiveMenu('Blackbird_InstallSchemaGenerator::retriever')
             ->_addBreadcrumb(
                 __('Install Schema Generator'),
                 __('Install Schema Generator')

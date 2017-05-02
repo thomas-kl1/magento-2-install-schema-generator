@@ -17,7 +17,18 @@
 -->
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
     <menu>
-        <add id="Blackbird_InstallSchemaGenerator::main_menu" title="Install Schema Generator" module="Blackbird_InstallSchemaGenerator" sortOrder="60" parent="Magento_Backend::system" resource="Magento_InstallSchemaGenerator::main_menu"/>
-        <add id="Blackbird_InstallSchemaGenerator::retriever" title="Generate InstallSchema.php file" module="Blackbird_InstallSchemaGenerator" sortOrder="40" parent="Blackbird_InstallSchemaGenerator::main_menu" action="install_schema_generator" resource="Blackbird_InstallSchemaGenerator::retriever" />
+        <add id="Blackbird_InstallSchemaGenerator::main_menu"
+             title="Install Schema Generator"
+             module="Blackbird_InstallSchemaGenerator"
+             sortOrder="60"
+             parent="Magento_Backend::system"
+             resource="Magento_InstallSchemaGenerator::main_menu"/>
+        <add id="Blackbird_InstallSchemaGenerator::retriever"
+             title="Generate InstallSchema.php file"
+             module="Blackbird_InstallSchemaGenerator"
+             sortOrder="10"
+             parent="Blackbird_InstallSchemaGenerator::main_menu"
+             action="install_schema_generator"
+             resource="Blackbird_InstallSchemaGenerator::retriever" />
     </menu>
 </config>

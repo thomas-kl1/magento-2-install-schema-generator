@@ -38,7 +38,7 @@ class SchemaRetriever
      */
     public function __construct(ResourceConnection $resourceConnection)
     {
-        $this->connection = $resourceConnection;
+        $this->resource = $resourceConnection;
         $dbConfig = $this->getConnection()->getConfig();
         $this->dbname = $dbConfig['dbname'];
     }    
@@ -131,7 +131,7 @@ class SchemaRetriever
         }
         
         $sql .= " ORDER BY C.TABLE_NAME, C.ORDINAL_POSITION";
-       
+
         // Prepare the query
         return $this->getConnection()->fetchAll($sql);
     }
@@ -143,7 +143,7 @@ class SchemaRetriever
      * @return array
      */
     private function sanitizeSchema(array $schema)
-    {        
+    {
         $finalSchema = [];
         
         foreach ($schema as $column) {

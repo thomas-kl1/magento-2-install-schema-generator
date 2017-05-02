@@ -26,19 +26,7 @@ class IndexDeclaration extends Template
      * @var string
      */
     protected $_template = 'Blackbird_InstallSchemaGenerator::install-schema/table-declaration/index-declaration.phtml';
-    
-    /**
-     * Retrieve the index column array to html
-     * 
-     * @param string $indexType
-     * @param array $columns
-     * @return string
-     */
-    public function getIndexColumnsArrayFormat($indexType, array $columns)
-    {
-        return '[' . implode(', ', $columns) . (!empty($indexType)) ? '],' : ']';
-    }
-    
+
     /**
      * Retrieve the index type to html
      * 
@@ -47,7 +35,7 @@ class IndexDeclaration extends Template
      */
     public function getIndexTypeArrayFormat($indexType)
     {
-        return (!empty($indexType)) ? '[\'type\' => ' . $indexType . ']' : '';
+        return (!empty($indexType)) ? '[\'type\' => ' . $indexType . ']' : '[]';
     }
 
     /**

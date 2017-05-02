@@ -20,18 +20,17 @@
  * @see \Blackbird\InstallSchemaGenerator\Block\InstallSchema\TableDeclaration\ForeignKeyDeclaration
  */
 ?>
-            <?php if ($block->isForeignKey()): ?>
+<?php if ($block->isForeignKey()): ?>
             ->addForeignKey(
                 $installer->getFkName(
-                    <?php echo $block->getFkTableName(); ?>,
-                    <?php echo $block->getFkColumnName(); ?>,
-                    <?php echo $block->getRefFkTableName(); ?>,
-                    <?php echo $block->getRefFkColumnName(); ?>,
+                    '<?php echo $block->getFkTableName(); ?>',
+                    '<?php echo $block->getFkColumnName(); ?>',
+                    '<?php echo $block->getRefFkTableName(); ?>',
+                    '<?php echo $block->getRefFkColumnName(); ?>'
                 ),
-                <?php echo $block->getFkColumnName(); ?>,
+                '<?php echo $block->getFkColumnName(); ?>',
                 $installer->getTable('<?php echo $block->getRefFkTableName(); ?>'),
-                <?php echo $block->getRefFkColumnName(); ?>,
+                '<?php echo $block->getRefFkColumnName(); ?>',
                 Table::ACTION_<?php echo $block->getDeleteRule(); ?>                
             )
-            <?php endif; ?>
-            
+<?php endif; ?>

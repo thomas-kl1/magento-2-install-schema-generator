@@ -38,7 +38,7 @@ class InstallSchema extends Template
         return $this->toHtml();
     }
 
-        /**
+    /**
      * Retrieve the table definition
      * 
      * @param array $tableName
@@ -52,5 +52,10 @@ class InstallSchema extends Template
             ->setTableName($tableName)
             ->setColumns($columns)
             ->toHtml();
+    }
+
+    public function toHtml()
+    {
+        return parent::toHtml();
     }
 }

@@ -20,7 +20,7 @@ use Magento\Framework\View\Element\Template;
 /**
  * Layout block of the foreign key declaration
  */
-class ForeignKey extends Template
+class ForeignKeyDeclaration extends Template
 {
     /**
      * @var string

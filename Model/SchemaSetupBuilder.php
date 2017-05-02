@@ -31,7 +31,7 @@ class SchemaSetupBuilder implements SchemaSetupBuilderInterface
     /**
      * Default namespace name
      */
-    const DEFAULT_NAMESPACE = 'Vendor/Area';
+    const DEFAULT_NAMESPACE = 'Vendor\Area';
     
     /**
      * Default filename for the setup file
@@ -80,24 +80,26 @@ class SchemaSetupBuilder implements SchemaSetupBuilderInterface
         $block = $this->blockFactory->createBlock(InstallSchema::class)
             ->setNamespace($this->sanitizeNamespace($namespace))
             ->setTables($this->schemaRetriever->getSchema($tables));
-        
+
         // Create the InstallSchema.php class file
         $writer = $this->filesystem->getDirectoryWrite(DirectoryList::TMP);
         
         $file = $writer->openFile($filename, 'w');
         
-	try {
+	    try {
             $file->lock();
             
             try {
                 $file->write($block->getHtml());
             } catch (\Exception $e) {
-                throw new LocalizedException(__('An error has occured during the generation of the %1 setup file.', $filename));
+                throw $e;
+                //throw new LocalizedException(__('An error has occured during the generation of the %1 setup file.', $filename));
             } finally {
                 $file->unlock();
             }
         } catch (\Exception $e) {
-            throw new LocalizedException(__('An error has occured during the generation of the %1 setup file.', $filename));
+            throw $e;
+            //throw new LocalizedException(__('An error has occured during the generation of the %1 setup file.', $filename));
         } finally {
             $file->close();
 	}
