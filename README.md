@@ -58,11 +58,6 @@ composer require blackbird/installschemagenerator
 php bin/magento setup:upgrade --keep-generated
 ```
 
-Once the repository added, run the two following commands:
-
-    composer require blackbird/installschemagenerator
-    php bin/magento setup:upgrade
-
 ## Contributors
 
 Thomas Klein ([Blackbird](https://black.bird.eu) team member)
