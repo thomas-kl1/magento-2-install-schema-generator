@@ -44,24 +44,19 @@ options:
 
 ## Installation
 
-Including this dependency in your Magento project is the more convenient way to integrate ISG.
+Run the following command in your Magento 2 root path:
 
-*This package is not yet available on packagist.*
-In order to be able to install it, you'll need to be sure that your root composer.json file contains a reference to the bitbucket repository.  To do so you'll need to add the following to `composer.json`:
+```
+#!php
 
-```json
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://bitbucket.org/blackbirdagency/magento2-extensions-isgenerator/"
-        }
-    ]
+composer require blackbird/installschemagenerator
 ```
 
-The above can also be added via the composer cli with the command: 
+```
+#!php
 
-    composer config repositories.blackbird_isg vcs https://bitbucket.org/blackbirdagency/magento2-extensions-isgenerator/
-
+php bin/magento setup:upgrade --keep-generated
+```
 
 Once the repository added, run the two following commands:
 
