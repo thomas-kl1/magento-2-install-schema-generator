@@ -86,22 +86,16 @@ class SchemaSetupBuilder implements SchemaSetupBuilderInterface
 
         $file = $writer->openFile($filename, 'w');
 
-	    try {
+        try {
             $file->lock();
-            
-            try {
-                $file->write($block->getHtml());
-            } catch (\Exception $e) {
-                throw new LocalizedException(__('An error has occurred during the generation of the %1 setup file.', $filename));
-            } finally {
-                $file->unlock();
-            }
+            $file->write($block->getHtml());
         } catch (\Exception $e) {
             throw new LocalizedException(__('An error has occurred during the generation of the %1 setup file.', $filename));
         } finally {
+            $file->unlock();
             $file->close();
-	}
-        
+        }
+
         return $filename;
     }
     
