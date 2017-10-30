@@ -103,6 +103,7 @@ class InstallSchemaGeneratorCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $returnCode = \Magento\Framework\Console\Cli::RETURN_SUCCESS;
         $this->appState->setAreaCode(\Magento\Framework\App\Area::AREA_GLOBAL);
 
         try {
@@ -114,7 +115,10 @@ class InstallSchemaGeneratorCommand extends Command
             
             $output->writeln('<info>The InstallSchema class file has been written in: ' . $filename . '</info>');
         } catch (\Exception $e) {
-            $output->writeln($e->getMessage());        
+            $output->writeln('<error>' . $e->getMessage() . '</error>');
+            $returnCode = \Magento\Framework\Console\Cli::RETURN_FAILURE;
         }
+
+        return $returnCode;
     }
 }
