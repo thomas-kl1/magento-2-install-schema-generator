@@ -62,6 +62,8 @@ php bin/magento setup:upgrade --keep-generated
 
 Thomas Klein ([Blackbird](https://black.bird.eu) team member)
 
+Feel free to contribute to the project: many issues exists and the generation is not always correct. Also, some part should be refactored to be more compliant with Magento 2 rules.
+
 ## License
 
 Blackbird Policy (https://store.bird.eu/license)
