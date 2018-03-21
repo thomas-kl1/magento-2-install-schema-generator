@@ -2,15 +2,34 @@
     "name": "blackbird/installschemagenerator",
     "description": "This module enable you to retrieve InstallSchema.php from tables of your choice",
     "type": "magento2-module",
-    "version": "100.1.2",
+    "keywords": [
+        "magento",
+        "install",
+        "schema",
+        "generator",
+        "dev",
+        "tool"
+    ],
+    "homepage": "https://github.com/blackbird-agency/magento-2-install-schema-generator",
+    "version": "100.1.3",
     "require": {
         "magento/magento-composer-installer": "*",
         "magento/framework": ">=100.0.0",
         "magento/module-backend": ">=100.0.0"
     },
-    "license": [
-        "OSL-3.0"
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Thomas Klein",
+            "email": "thomas@bird.eu",
+            "homepage": "https://black.bird.eu/en/thomas-klein",
+            "role": "lead"
+        }
     ],
+    "support": {
+        "source": "https://github.com/blackbird-agency/magento-2-install-schema-generator",
+        "issues": "https://github.com/blackbird-agency/magento-2-install-schema-generator/issues"
+    },
     "autoload": {
         "files": [
             "registration.php"

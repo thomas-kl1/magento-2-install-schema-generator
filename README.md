@@ -47,15 +47,11 @@ options:
 Run the following command in your Magento 2 root path:
 
 ```
-#!php
-
 composer require blackbird/installschemagenerator
 ```
 
 ```
-#!php
-
-php bin/magento setup:upgrade --keep-generated
+php bin/magento setup:upgrade
 ```
 
 ## Contributors
@@ -66,4 +62,4 @@ Feel free to contribute to the project: many issues exists and the generation is
 
 ## License
 
-Blackbird Policy (https://store.bird.eu/license)
+[MIT License](LICENSE)

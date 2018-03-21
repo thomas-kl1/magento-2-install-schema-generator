@@ -10,9 +10,9 @@
  *
  * @category        Blackbird
  * @package         Blackbird_InstallSchemaGenerator
- * @copyright       Copyright (c) 2017 Blackbird (https://black.bird.eu)
+ * @copyright       Copyright (c) 2018 Blackbird (https://black.bird.eu)
  * @author          Blackbird Team
- * @license         https://www.store.bird.eu/license/
+ * @license         MIT LICENSE
  */
 -->
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">

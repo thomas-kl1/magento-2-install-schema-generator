@@ -9,9 +9,9 @@
  *
  * @category        Blackbird
  * @package         Blackbird_InstallSchemaGenerator
- * @copyright       Copyright (c) 2017 Blackbird (https://black.bird.eu)
+ * @copyright       Copyright (c) 2018 Blackbird (https://black.bird.eu)
  * @author          Blackbird Team
- * @license         https://www.store.bird.eu/license/
+ * @license         MIT LICENSE
  */
 namespace Blackbird\InstallSchemaGenerator\Block;
 
