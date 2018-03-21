@@ -4,8 +4,9 @@
     "type": "magento2-module",
     "version": "100.1.2",
     "require": {
-        "magento/framework": "101.*.*",
-        "magento/module-backend": "100.*.*"
+        "magento/magento-composer-installer": "*",
+        "magento/framework": ">=100.0.0",
+        "magento/module-backend": ">=100.0.0"
     },
     "license": [
         "OSL-3.0"
