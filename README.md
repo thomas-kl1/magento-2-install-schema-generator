@@ -1,5 +1,8 @@
 # Install Schema Generator
 
+[![Latest Stable Version](https://img.shields.io/packagist/v/blackbird/installschemagenerator.svg?style=flat-square)](https://packagist.org/packages/blackbird/installschemagenerator)
+[![License: MIT](https://img.shields.io/github/license/blackbird-agency/magento-2-install-schema-generator.svg?style=flat-square)](./LICENSE) 
+
 **An extension for Magento 2 by Blackbird Agency**
 
 ## Synopsis
@@ -42,24 +45,48 @@ options:
 
 ![alt tag](https://black.bird.eu/media/wysiwyg/images/screen_backend_isg.jpg)
 
-## Installation
+## Setup
 
-Run the following command in your Magento 2 root path:
+### Get the package
+
+**Zip Package:**
+
+Unzip the package in app/code/Blackbird/InstallSchemaGenerator.
+
+**Composer Package:**
 
 ```
 composer require blackbird/installschemagenerator
 ```
 
+### Install the module
+
+Then, run the following magento command:
+
 ```
 php bin/magento setup:upgrade
 ```
 
-## Contributors
+**If you are in production mode, do not forget to recompile and redeploy the static resources.**
 
-Thomas Klein ([Blackbird](https://black.bird.eu) team member)
+## Support
 
-Feel free to contribute to the project: many issues exists and the generation is not always correct. Also, some part should be refactored to be more compliant with Magento 2 rules.
+Raise a [request](https://github.com/blackbird-agency/magento-2-install-schema-generator/issues).
 
-## License
+## Authors
 
-[MIT License](LICENSE)
+- **Thomas Klein** - *Initial work* - [It's me!](https://github.com/thomas-blackbird)
+- **Blackbird Team** - *Contributor* - [They're awesome!](https://github.com/blackbird-agency)
+
+## Contact
+
+For further information, contact us:
+
+- by email: hello@bird.eu
+- or by form: [https://black.bird.eu/en/contacts/](https://black.bird.eu/contacts/)
+
+## Licence
+
+This project is licensed under the Blackbird Policy License - see the [LICENSE](https://store.bird.eu/en/license) link for details.
+
+***That's all folks!***
