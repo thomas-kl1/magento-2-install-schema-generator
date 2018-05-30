@@ -87,6 +87,6 @@ For further information, contact us:
 
 ## Licence
 
-This project is licensed under the Blackbird Policy License - see the [LICENSE](https://store.bird.eu/en/license) link for details.
+This project is licensed under the Blackbird Policy License - see the [LICENSE](./LICENSE) link for details.
 
 ***That's all folks!***
